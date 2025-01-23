@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include "D1Define.h"
+#include "PanDefine.h"
 #include "Engine/DataAsset.h"
-#include "D1CharacterData.generated.h"
+#include "PanCharacterData.generated.h"
 
 USTRUCT(BlueprintType)
-struct FD1DefaultArmorMeshSet
+struct FPanDefaultArmorMeshSet
 {
 	GENERATED_BODY()
 		
@@ -37,12 +37,12 @@ public:
  * 
  */
 UCLASS(BlueprintType)
-class D1GAME_API UD1CharacterData : public UPrimaryDataAsset
+class D1GAME_API UPanCharacterData : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 	
 public:
-	static const UD1CharacterData& Get();
+	static const UPanCharacterData& Get();
 
 public:
 #if WITH_EDITOR
@@ -50,9 +50,9 @@ public:
 #endif // WITH_EDITOR
 
 public:
-	const FD1DefaultArmorMeshSet& GetDefaultArmorMeshSet(ECharacterSkinType CharacterSkinType) const;
+	const FPanDefaultArmorMeshSet& GetDefaultArmorMeshSet(ECharacterSkinType CharacterSkinType) const;
 
 private:
 	UPROPERTY(EditDefaultsOnly)
-	TMap<ECharacterSkinType, FD1DefaultArmorMeshSet> DefaultArmorMeshMap;
+	TMap<ECharacterSkinType, FPanDefaultArmorMeshSet> DefaultArmorMeshMap;
 };

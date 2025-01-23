@@ -1,12 +1,12 @@
 ﻿#pragma once
 
-#include "D1Define.h"
+#include "PanDefine.h"
 #include "AbilitySystem/LyraAbilitySourceInterface.h"
-#include "System/D1GameplayTagStack.h"
-#include "D1ItemInstance.generated.h"
+#include "System/PanGameplayTagStack.h"
+#include "PanItemInstance.generated.h"
 
 USTRUCT(BlueprintType)
-struct FD1ItemRarityProbability
+struct FPanItemRarityProbability
 {
 	GENERATED_BODY()
 
@@ -19,12 +19,12 @@ public:
 };
 
 UCLASS(BlueprintType)
-class UD1ItemInstance : public UObject, public ILyraAbilitySourceInterface
+class UPanItemInstance : public UObject, public ILyraAbilitySourceInterface
 {
 	GENERATED_BODY()
 	
 public:
-	UD1ItemInstance(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UPanItemInstance(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -43,7 +43,7 @@ public:
 	void RemoveStatTagStack(FGameplayTag StatTag);
 
 public:
-	static EItemRarity DetermineItemRarity(const TArray<FD1ItemRarityProbability>& ItemProbabilities);
+	static EItemRarity DetermineItemRarity(const TArray<FPanItemRarityProbability>& ItemProbabilities);
 	
 public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
@@ -59,11 +59,11 @@ public:
 	int32 GetStackCountByTag(FGameplayTag StatTag) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	const FD1GameplayTagStackContainer& GetStatContainer() const { return StatContainer; }
+	const FPanGameplayTagStackContainer& GetStatContainer() const { return StatContainer; }
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintPure="false", meta=(DeterminesOutputType="FragmentClass"))
-	const UD1ItemFragment* FindFragmentByClass(TSubclassOf<UD1ItemFragment> FragmentClass) const;
+	const UPanItemFragment* FindFragmentByClass(TSubclassOf<UPanItemFragment> FragmentClass) const;
 
 	template <typename FragmentClass>
 	const FragmentClass* FindFragmentByClass() const
@@ -84,5 +84,5 @@ private:
 	EItemRarity ItemRarity = EItemRarity::Poor;
 	
 	UPROPERTY(Replicated)
-	FD1GameplayTagStackContainer StatContainer;
+	FPanGameplayTagStackContainer StatContainer;
 };

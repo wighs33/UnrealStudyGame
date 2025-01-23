@@ -1,24 +1,24 @@
-﻿#include "D1ItemData.h"
+﻿#include "PanItemData.h"
 
 #if WITH_EDITOR
 #include "Misc/DataValidation.h"
 #endif // WITH_EDITOR
 
-#include "Item/D1ItemTemplate.h"
-#include "Item/Fragments/D1ItemFragment_Equipable_Armor.h"
-#include "Item/Fragments/D1ItemFragment_Equipable_Weapon.h"
+#include "Item/PanItemTemplate.h"
+#include "Item/Fragments/PanItemFragment_Equipable_Armor.h"
+#include "Item/Fragments/PanItemFragment_Equipable_Weapon.h"
 #include "System/LyraAssetManager.h"
 #include "UObject/ObjectSaveContext.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemData)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(PanItemData)
 
-const UD1ItemData& UD1ItemData::Get()
+const UPanItemData& UPanItemData::Get()
 {
 	return ULyraAssetManager::Get().GetItemData();
 }
 
 #if WITH_EDITORONLY_DATA
-void UD1ItemData::PreSave(FObjectPreSaveContext SaveContext)
+void UPanItemData::PreSave(FObjectPreSaveContext SaveContext)
 {
 	Super::PreSave(SaveContext);
 
@@ -35,15 +35,15 @@ void UD1ItemData::PreSave(FObjectPreSaveContext SaveContext)
 	{
 		ItemTemplateClassToID.Emplace(Pair.Value, Pair.Key);
 
-		const UD1ItemTemplate* ItemTemplate = Pair.Value.GetDefaultObject();
-		if (const UD1ItemFragment_Equipable_Weapon* WeaponFragment = ItemTemplate->FindFragmentByClass<UD1ItemFragment_Equipable_Weapon>())
+		const UPanItemTemplate* ItemTemplate = Pair.Value.GetDefaultObject();
+		if (const UPanItemFragment_Equipable_Weapon* WeaponFragment = ItemTemplate->FindFragmentByClass<UPanItemFragment_Equipable_Weapon>())
 		{
 			if (WeaponFragment->WeaponType != EWeaponType::Unarmed)
 			{
 				WeaponItemTemplateClasses.Add(Pair.Value);
 			}
 		}
-		else if (ItemTemplate->FindFragmentByClass<UD1ItemFragment_Equipable_Armor>())
+		else if (ItemTemplate->FindFragmentByClass<UPanItemFragment_Equipable_Armor>())
 		{
 			ArmorItemTemplateClasses.Add(Pair.Value);
 		}
@@ -52,12 +52,12 @@ void UD1ItemData::PreSave(FObjectPreSaveContext SaveContext)
 #endif // WITH_EDITORONLY_DATA
 
 #if WITH_EDITOR
-EDataValidationResult UD1ItemData::IsDataValid(FDataValidationContext& Context) const
+EDataValidationResult UPanItemData::IsDataValid(FDataValidationContext& Context) const
 {
 	EDataValidationResult Result = Super::IsDataValid(Context);
 	
 	TSet<int32> ItemTemplateIDSet;
-	TSet<TSubclassOf<UD1ItemTemplate>> ItemTemplateClassSet;
+	TSet<TSubclassOf<UPanItemTemplate>> ItemTemplateClassSet;
 
 	for (const auto& Pair : ItemTemplateIDToClass)
 	{
@@ -79,7 +79,7 @@ EDataValidationResult UD1ItemData::IsDataValid(FDataValidationContext& Context) 
 		ItemTemplateIDSet.Add(ItemTemplateID);
 
 		// Class Check
-		const TSubclassOf<UD1ItemTemplate> ItemTemplateClass = Pair.Value;
+		const TSubclassOf<UPanItemTemplate> ItemTemplateClass = Pair.Value;
 		
 		if (ItemTemplateClass == nullptr)
 		{
@@ -99,21 +99,21 @@ EDataValidationResult UD1ItemData::IsDataValid(FDataValidationContext& Context) 
 }
 #endif // WITH_EDITOR
 
-const UD1ItemTemplate& UD1ItemData::FindItemTemplateByID(int32 ItemTemplateID) const
+const UPanItemTemplate& UPanItemData::FindItemTemplateByID(int32 ItemTemplateID) const
 {
-	const TSubclassOf<UD1ItemTemplate>* ItemTemplateClass = ItemTemplateIDToClass.Find(ItemTemplateID);
+	const TSubclassOf<UPanItemTemplate>* ItemTemplateClass = ItemTemplateIDToClass.Find(ItemTemplateID);
 	ensureAlwaysMsgf(ItemTemplateClass, TEXT("Can't find ItemTemplateClass from ID [%d]"), ItemTemplateID);
 	return *(ItemTemplateClass->GetDefaultObject());
 }
 
-int32 UD1ItemData::FindItemTemplateIDByClass(TSubclassOf<UD1ItemTemplate> ItemTemplateClass) const
+int32 UPanItemData::FindItemTemplateIDByClass(TSubclassOf<UPanItemTemplate> ItemTemplateClass) const
 {
 	const int32* ItemTemplateID = ItemTemplateClassToID.Find(ItemTemplateClass);
 	ensureAlwaysMsgf(ItemTemplateID, TEXT("Can't find ItemTemplateID from Class"));
 	return *ItemTemplateID;
 }
 
-void UD1ItemData::GetAllItemTemplateClasses(TArray<TSubclassOf<UD1ItemTemplate>>& OutItemTemplateClasses) const
+void UPanItemData::GetAllItemTemplateClasses(TArray<TSubclassOf<UPanItemTemplate>>& OutItemTemplateClasses) const
 {
 	OutItemTemplateClasses.Reset();
 	OutItemTemplateClasses.Reserve(ItemTemplateIDToClass.Num());

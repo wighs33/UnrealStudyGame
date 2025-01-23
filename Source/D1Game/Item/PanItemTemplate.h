@@ -1,25 +1,25 @@
 ﻿#pragma once
 
-#include "D1ItemTemplate.generated.h"
+#include "PanItemTemplate.generated.h"
 
-class UD1ItemInstance;
+class UPanItemInstance;
 
 UCLASS(DefaultToInstanced, EditInlineNew, Abstract)
-class UD1ItemFragment : public UObject
+class UPanItemFragment : public UObject
 {
 	GENERATED_BODY()
 	
 public:
-	virtual void OnInstanceCreated(UD1ItemInstance* Instance) const { }
+	virtual void OnInstanceCreated(UPanItemInstance* Instance) const { }
 };
 
 UCLASS(Blueprintable, Const, Abstract)
-class UD1ItemTemplate : public UObject
+class UPanItemTemplate : public UObject
 {
 	GENERATED_BODY()
 	
 public:
-	UD1ItemTemplate(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UPanItemTemplate(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
 #if WITH_EDITOR
@@ -28,7 +28,7 @@ protected:
 	
 public:
 	UFUNCTION(BlueprintCallable, BlueprintPure="false", meta=(DeterminesOutputType="FragmentClass"))
-	const UD1ItemFragment* FindFragmentByClass(TSubclassOf<UD1ItemFragment> FragmentClass) const;
+	const UPanItemFragment* FindFragmentByClass(TSubclassOf<UPanItemFragment> FragmentClass) const;
 
 	template <typename FragmentClass>
 	const FragmentClass* FindFragmentByClass() const
@@ -56,5 +56,5 @@ public:
 	TSoftObjectPtr<UStaticMesh> PickupableMesh;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced)
-	TArray<TObjectPtr<UD1ItemFragment>> Fragments;
+	TArray<TObjectPtr<UPanItemFragment>> Fragments;
 };

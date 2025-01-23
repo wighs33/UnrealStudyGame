@@ -1,20 +1,20 @@
-﻿#include "D1ClassData.h"
+﻿#include "PanClassData.h"
 
 #include "System/LyraAssetManager.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(D1ClassData)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(PanClassData)
 
-const UD1ClassData& UD1ClassData::Get()
+const UPanClassData& UPanClassData::Get()
 {
 	return ULyraAssetManager::Get().GetClassData();
 }
 
-const FD1ClassInfoEntry& UD1ClassData::GetClassInfoEntry(ECharacterClassType ClassType) const
+const FPanClassInfoEntry& UPanClassData::GetClassInfoEntry(ECharacterClassType ClassType) const
 {
 	const int32 ClassIndex = (int32)ClassType;
 	if (ClassIndex < 0 || ClassIndex >= (int32)ECharacterClassType::Count)
 	{
-		static FD1ClassInfoEntry EmptyEntry;
+		static FPanClassInfoEntry EmptyEntry;
 		return EmptyEntry;
 	}
 	

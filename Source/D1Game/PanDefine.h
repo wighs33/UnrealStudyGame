@@ -180,7 +180,7 @@ enum class ECharacterClassType : uint8
 };
 
 UENUM(BlueprintType)
-enum class ED1TeamID : uint8
+enum class EPanTeamID : uint8
 {
 	NoTeam,
 	Monster = 1,

@@ -1,14 +1,14 @@
 ﻿#pragma once
 
-#include "D1ArmorBase.generated.h"
+#include "PanArmorBase.generated.h"
 
 UCLASS(BlueprintType, Blueprintable)
-class AD1ArmorBase : public AActor
+class APanArmorBase : public AActor
 {
 	GENERATED_BODY()
 	
 public:
-	AD1ArmorBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	APanArmorBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
 	void InitializeActor(TSoftObjectPtr<USkeletalMesh> InDefaultArmorMesh, TSoftObjectPtr<USkeletalMesh> InSecondaryArmorMesh, FName InSkinMaterialSlotName, TSoftObjectPtr<UMaterialInterface> InSkinMaterial);

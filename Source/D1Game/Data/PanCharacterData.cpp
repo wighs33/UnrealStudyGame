@@ -1,17 +1,17 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Data/D1CharacterData.h"
+#include "Data/PanCharacterData.h"
 #include "System/LyraAssetManager.h"
 #include "UObject/ObjectSaveContext.h"
 
-const UD1CharacterData& UD1CharacterData::Get()
+const UPanCharacterData& UPanCharacterData::Get()
 {
 	return ULyraAssetManager::Get().GetCharacterData();
 }
 
 #if WITH_EDITOR
-void UD1CharacterData::PreSave(FObjectPreSaveContext ObjectSaveContext)
+void UPanCharacterData::PreSave(FObjectPreSaveContext ObjectSaveContext)
 {
 	Super::PreSave(ObjectSaveContext);
 
@@ -22,11 +22,11 @@ void UD1CharacterData::PreSave(FObjectPreSaveContext ObjectSaveContext)
 }
 #endif // WITH_EDITOR
 
-const FD1DefaultArmorMeshSet& UD1CharacterData::GetDefaultArmorMeshSet(ECharacterSkinType CharacterSkinType) const
+const FPanDefaultArmorMeshSet& UPanCharacterData::GetDefaultArmorMeshSet(ECharacterSkinType CharacterSkinType) const
 {
 	if (DefaultArmorMeshMap.Contains(CharacterSkinType) == false)
 	{
-		static FD1DefaultArmorMeshSet EmptyEntry;
+		static FPanDefaultArmorMeshSet EmptyEntry;
 		return EmptyEntry;
 	}
 

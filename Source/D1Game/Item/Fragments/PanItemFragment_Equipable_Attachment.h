@@ -1,18 +1,18 @@
 ﻿#pragma once
 
-#include "D1ItemFragment_Equipable.h"
-#include "D1ItemFragment_Equipable_Attachment.generated.h"
+#include "PanItemFragment_Equipable.h"
+#include "PanItemFragment_Equipable_Attachment.generated.h"
 
-//class AD1EquipmentBase;
+//class APanEquipmentBase;
 
 USTRUCT(BlueprintType)
-struct FD1WeaponAttachInfo
+struct FPanWeaponAttachInfo
 {
 	GENERATED_BODY()
 
 public:
 	//UPROPERTY(EditDefaultsOnly)
-	//TSubclassOf<AD1EquipmentBase> SpawnWeaponClass;
+	//TSubclassOf<APanEquipmentBase> SpawnWeaponClass;
 
 	UPROPERTY(EditDefaultsOnly)
 	FName AttachSocket;
@@ -22,19 +22,19 @@ public:
 };
 
 UCLASS(Abstract, Const)
-class UD1ItemFragment_Equipable_Attachment : public UD1ItemFragment_Equipable
+class UPanItemFragment_Equipable_Attachment : public UPanItemFragment_Equipable
 {
 	GENERATED_BODY()
 	
 public:
-	UD1ItemFragment_Equipable_Attachment(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UPanItemFragment_Equipable_Attachment(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
 	UPROPERTY(EditDefaultsOnly)
 	EWeaponHandType WeaponHandType = EWeaponHandType::Count;
 
 	UPROPERTY(EditDefaultsOnly)
-	FD1WeaponAttachInfo WeaponAttachInfo;
+	FPanWeaponAttachInfo WeaponAttachInfo;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSoftObjectPtr<UAnimMontage> EquipMontage;

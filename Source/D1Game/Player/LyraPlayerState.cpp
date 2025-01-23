@@ -19,8 +19,8 @@
 #include "Messages/LyraVerbMessage.h"
 #include "Net/UnrealNetwork.h"
 
-#include "Data/D1ClassData.h"
-#include "Item/Managers/D1EquipmentManagerComponent.h"
+#include "Data/PanClassData.h"
+#include "Item/Managers/PanEquipmentManagerComponent.h"
 #include "Character/LyraCharacter.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(LyraPlayerState)
@@ -311,13 +311,13 @@ void ALyraPlayerState::Server_SelectClass_Implementation(ECharacterClassType Cla
 		return;
 
 	CharacterClassType = ClassType;
-	const FD1ClassInfoEntry& ClassEntry = UD1ClassData::Get().GetClassInfoEntry(CharacterClassType);
+	const FPanClassInfoEntry& ClassEntry = UPanClassData::Get().GetClassInfoEntry(CharacterClassType);
 
 	if (ALyraCharacter* LyraCharacter = GetPawn<ALyraCharacter>())
 	{
-		if (UD1EquipmentManagerComponent* EquipmentManager = LyraCharacter->GetComponentByClass<UD1EquipmentManagerComponent>())
+		if (UPanEquipmentManagerComponent* EquipmentManager = LyraCharacter->GetComponentByClass<UPanEquipmentManagerComponent>())
 		{
-			for (const FD1DefaultItemEntry& DefaultItemEntry : ClassEntry.DefaultItemEntries)
+			for (const FPanDefaultItemEntry& DefaultItemEntry : ClassEntry.DefaultItemEntries)
 			{
 				EquipmentManager->SetEquipment(DefaultItemEntry.EquipmentSlotType, DefaultItemEntry.ItemTemplateClass, DefaultItemEntry.ItemRarity, DefaultItemEntry.ItemCount);
 			}

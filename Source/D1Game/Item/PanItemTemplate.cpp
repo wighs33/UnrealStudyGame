@@ -1,24 +1,24 @@
-﻿#include "D1ItemTemplate.h"
+﻿#include "PanItemTemplate.h"
 
 #if WITH_EDITOR
 #include "Misc/DataValidation.h"
 #endif // WITH_EDITOR
 
-#include "Fragments/D1ItemFragment_Equipable.h"
-#include "Fragments/D1ItemFragment_Equipable_Armor.h"
-#include "Fragments/D1ItemFragment_Equipable_Utility.h"
-#include "Fragments/D1ItemFragment_Equipable_Weapon.h"
+#include "Fragments/PanItemFragment_Equipable.h"
+#include "Fragments/PanItemFragment_Equipable_Armor.h"
+#include "Fragments/PanItemFragment_Equipable_Utility.h"
+#include "Fragments/PanItemFragment_Equipable_Weapon.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemTemplate)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(PanItemTemplate)
 
-UD1ItemTemplate::UD1ItemTemplate(const FObjectInitializer& ObjectInitializer)
+UPanItemTemplate::UPanItemTemplate(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
     
 }
 
 #if WITH_EDITOR
-EDataValidationResult UD1ItemTemplate::IsDataValid(FDataValidationContext& Context) const
+EDataValidationResult UPanItemTemplate::IsDataValid(FDataValidationContext& Context) const
 {
 	EDataValidationResult Result = UObject::IsDataValid(Context);
 
@@ -34,10 +34,10 @@ EDataValidationResult UD1ItemTemplate::IsDataValid(FDataValidationContext& Conte
 		Result = EDataValidationResult::Invalid;
 	}
 	
-	const UD1ItemFragment_Equipable* FoundEquipable = nullptr;
-	for (UD1ItemFragment* Fragment : Fragments)
+	const UPanItemFragment_Equipable* FoundEquipable = nullptr;
+	for (UPanItemFragment* Fragment : Fragments)
 	{
-		if (UD1ItemFragment_Equipable* CurrentEquippable = Cast<UD1ItemFragment_Equipable>(Fragment))
+		if (UPanItemFragment_Equipable* CurrentEquippable = Cast<UPanItemFragment_Equipable>(Fragment))
 		{
 			if (FoundEquipable)
 			{
@@ -59,7 +59,7 @@ EDataValidationResult UD1ItemTemplate::IsDataValid(FDataValidationContext& Conte
 		
 		if (FoundEquipable->EquipmentType == EEquipmentType::Armor)
 		{
-			const UD1ItemFragment_Equipable_Armor* ArmorFragment = Cast<UD1ItemFragment_Equipable_Armor>(FoundEquipable);
+			const UPanItemFragment_Equipable_Armor* ArmorFragment = Cast<UPanItemFragment_Equipable_Armor>(FoundEquipable);
 			
 			if (ArmorFragment->ArmorType == EArmorType::Count)
 			{
@@ -69,7 +69,7 @@ EDataValidationResult UD1ItemTemplate::IsDataValid(FDataValidationContext& Conte
 		}
 		else if (FoundEquipable->EquipmentType == EEquipmentType::Weapon)
 		{
-			const UD1ItemFragment_Equipable_Weapon* WeaponFragment = Cast<UD1ItemFragment_Equipable_Weapon>(FoundEquipable);
+			const UPanItemFragment_Equipable_Weapon* WeaponFragment = Cast<UPanItemFragment_Equipable_Weapon>(FoundEquipable);
 			
 			if (WeaponFragment->WeaponType == EWeaponType::Count)
 			{
@@ -85,7 +85,7 @@ EDataValidationResult UD1ItemTemplate::IsDataValid(FDataValidationContext& Conte
 		}
 		else if (FoundEquipable->EquipmentType == EEquipmentType::Utility)
 		{
-			const UD1ItemFragment_Equipable_Utility* UtilityFragment = Cast<UD1ItemFragment_Equipable_Utility>(FoundEquipable);
+			const UPanItemFragment_Equipable_Utility* UtilityFragment = Cast<UPanItemFragment_Equipable_Utility>(FoundEquipable);
 
 			if (UtilityFragment->UtilityType == EUtilityType::Count)
 			{
@@ -108,11 +108,11 @@ EDataValidationResult UD1ItemTemplate::IsDataValid(FDataValidationContext& Conte
 }
 #endif // WITH_EDITOR
 
-const UD1ItemFragment* UD1ItemTemplate::FindFragmentByClass(TSubclassOf<UD1ItemFragment> FragmentClass) const
+const UPanItemFragment* UPanItemTemplate::FindFragmentByClass(TSubclassOf<UPanItemFragment> FragmentClass) const
 {
 	if (FragmentClass)
 	{
-		for (UD1ItemFragment* Fragment : Fragments)
+		for (UPanItemFragment* Fragment : Fragments)
 		{
 			if (Fragment && Fragment->IsA(FragmentClass))
 			{

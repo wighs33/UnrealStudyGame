@@ -1,18 +1,18 @@
-﻿#include "D1ItemFragment_Equipable_Weapon.h"
+﻿#include "PanItemFragment_Equipable_Weapon.h"
 
-#include "Item/D1ItemInstance.h"
+#include "Item/PanItemInstance.h"
 #include "UObject/ObjectSaveContext.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemFragment_Equipable_Weapon)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(PanItemFragment_Equipable_Weapon)
 
-UD1ItemFragment_Equipable_Weapon::UD1ItemFragment_Equipable_Weapon(const FObjectInitializer& ObjectInitializer)
+UPanItemFragment_Equipable_Weapon::UPanItemFragment_Equipable_Weapon(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
     EquipmentType = EEquipmentType::Weapon;
 }
 
 #if WITH_EDITORONLY_DATA
-void UD1ItemFragment_Equipable_Weapon::PreSave(FObjectPreSaveContext SaveContext)
+void UPanItemFragment_Equipable_Weapon::PreSave(FObjectPreSaveContext SaveContext)
 {
 	Super::PreSave(SaveContext);
 
@@ -28,7 +28,7 @@ void UD1ItemFragment_Equipable_Weapon::PreSave(FObjectPreSaveContext SaveContext
 }
 #endif // WITH_EDITORONLY_DATA
 
-void UD1ItemFragment_Equipable_Weapon::OnInstanceCreated(UD1ItemInstance* ItemInstance) const
+void UPanItemFragment_Equipable_Weapon::OnInstanceCreated(UPanItemInstance* ItemInstance) const
 {
 	Super::OnInstanceCreated(ItemInstance);
 	

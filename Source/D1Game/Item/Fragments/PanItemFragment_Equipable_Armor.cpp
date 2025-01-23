@@ -1,18 +1,18 @@
-﻿#include "D1ItemFragment_Equipable_Armor.h"
+﻿#include "PanItemFragment_Equipable_Armor.h"
 
-#include "Item/D1ItemInstance.h"
+#include "Item/PanItemInstance.h"
 #include "UObject/ObjectSaveContext.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemFragment_Equipable_Armor)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(PanItemFragment_Equipable_Armor)
 
-UD1ItemFragment_Equipable_Armor::UD1ItemFragment_Equipable_Armor(const FObjectInitializer& ObjectInitializer)
+UPanItemFragment_Equipable_Armor::UPanItemFragment_Equipable_Armor(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
     EquipmentType = EEquipmentType::Armor;
 }
 
 #if WITH_EDITORONLY_DATA
-void UD1ItemFragment_Equipable_Armor::PreSave(FObjectPreSaveContext SaveContext)
+void UPanItemFragment_Equipable_Armor::PreSave(FObjectPreSaveContext SaveContext)
 {
 	Super::PreSave(SaveContext);
 
@@ -33,7 +33,7 @@ void UD1ItemFragment_Equipable_Armor::PreSave(FObjectPreSaveContext SaveContext)
 }
 #endif // WITH_EDITORONLY_DATA
 
-void UD1ItemFragment_Equipable_Armor::OnInstanceCreated(UD1ItemInstance* ItemInstance) const
+void UPanItemFragment_Equipable_Armor::OnInstanceCreated(UPanItemInstance* ItemInstance) const
 {
 	Super::OnInstanceCreated(ItemInstance);
 	

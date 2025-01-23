@@ -5,17 +5,17 @@
 #include "Engine/AssetManager.h"
 #include "LyraAssetManagerStartupJob.h"
 #include "Templates/SubclassOf.h"
-#include "Data/D1AssetData.h"
+#include "Data/PanAssetData.h"
 #include "LyraAssetManager.generated.h"
 
 class UPrimaryDataAsset;
 
 class ULyraGameData;
 class ULyraPawnData;
-class UD1CharacterData;
-class UD1ItemData;
-class UD1ClassData;
-class UD1AssetData;
+class UPanCharacterData;
+class UPanItemData;
+class UPanClassData;
+class UPanAssetData;
 
 struct FLyraBundles
 {
@@ -59,10 +59,10 @@ public:
 
 	const ULyraGameData& GetGameData();
 	const ULyraPawnData* GetDefaultPawnData() const;
-	const UD1CharacterData& GetCharacterData();
-	const UD1ItemData& GetItemData();
-	const UD1ClassData& GetClassData();
-	const UD1AssetData& GetAssetData();
+	const UPanCharacterData& GetCharacterData();
+	const UPanItemData& GetItemData();
+	const UPanClassData& GetClassData();
+	const UPanAssetData& GetAssetData();
 
 protected:
 	template <typename GameDataClass>
@@ -108,16 +108,16 @@ protected:
 	TSoftObjectPtr<ULyraPawnData> DefaultPawnData;
 
 	UPROPERTY(Config)
-	TSoftObjectPtr<UD1CharacterData> CharacterDataPath;
+	TSoftObjectPtr<UPanCharacterData> CharacterDataPath;
 
 	UPROPERTY(Config)
-	TSoftObjectPtr<UD1ItemData> ItemDataPath;
+	TSoftObjectPtr<UPanItemData> ItemDataPath;
 
 	UPROPERTY(Config)
-	TSoftObjectPtr<UD1ClassData> ClassDataPath;
+	TSoftObjectPtr<UPanClassData> ClassDataPath;
 
 	UPROPERTY(Config)
-	TSoftObjectPtr<UD1AssetData> AssetDataPath;
+	TSoftObjectPtr<UPanAssetData> AssetDataPath;
 
 private:
 	// Flushes the StartupJobs array. Processes all startup work.
@@ -171,7 +171,7 @@ AssetType* ULyraAssetManager::GetAssetByPath(const TSoftObjectPtr<AssetType>& As
 template <typename AssetType>
 AssetType* ULyraAssetManager::GetAssetByName(const FName& AssetName, bool bKeepInMemory)
 {
-	const UD1AssetData& AssetData = Get().GetAssetData();
+	const UPanAssetData& AssetData = Get().GetAssetData();
 	const FSoftObjectPath& AssetPath = AssetData.GetAssetPathByName(AssetName);
 	TSoftObjectPtr<AssetType> AssetPtr(AssetPath);
 	return GetAssetByPath<AssetType>(AssetPtr, bKeepInMemory);
@@ -206,7 +206,7 @@ TSubclassOf<AssetType> ULyraAssetManager::GetSubclassByPath(const TSoftClassPtr<
 template <typename AssetType>
 TSubclassOf<AssetType> ULyraAssetManager::GetSubclassByName(const FName& AssetName, bool bKeepInMemory)
 {
-	const UD1AssetData& AssetData = Get().GetAssetData();
+	const UPanAssetData& AssetData = Get().GetAssetData();
 	const FSoftObjectPath& AssetPath = AssetData.GetAssetPathByName(AssetName);
 
 	FString AssetPathString = AssetPath.GetAssetPathString();

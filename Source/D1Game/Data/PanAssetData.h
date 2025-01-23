@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "D1AssetData.generated.h"
+#include "PanAssetData.generated.h"
 
 USTRUCT()
 struct FAssetEntry
@@ -28,13 +28,13 @@ public:
 	TArray<FAssetEntry> AssetEntries;
 };
 
-UCLASS(Const, CollapseCategories, meta=(DisplayName="D1 Asset Data"))
-class UD1AssetData : public UPrimaryDataAsset
+UCLASS(Const, CollapseCategories, meta=(DisplayName="Pan Asset Data"))
+class UPanAssetData : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 
 public:
-	static const UD1AssetData& Get();
+	static const UPanAssetData& Get();
 	
 protected:
 #if WITH_EDITOR

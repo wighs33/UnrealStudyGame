@@ -1,12 +1,12 @@
 ﻿#pragma once
 
-#include "D1Define.h"
+#include "PanDefine.h"
 #include "GameplayTags.h"
-#include "Item/D1ItemTemplate.h"
-#include "D1ItemFragment_Equipable.generated.h"
+#include "Item/PanItemTemplate.h"
+#include "PanItemFragment_Equipable.generated.h"
 
 class ULyraAbilitySet;
-class UD1ItemInstance;
+class UPanItemInstance;
 
 USTRUCT(BlueprintType)
 struct FRarityStat
@@ -70,16 +70,16 @@ public:
 };
 
 UCLASS(Abstract, Const)
-class UD1ItemFragment_Equipable : public UD1ItemFragment
+class UPanItemFragment_Equipable : public UPanItemFragment
 {
 	GENERATED_BODY()
 	
 public:
-	UD1ItemFragment_Equipable(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UPanItemFragment_Equipable(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	
 protected:
-	void AddStatTagStack(UD1ItemInstance* ItemInstance, const TArray<FRarityStatSet>& RarityStatSets) const;
-	void AddStatTagStack(UD1ItemInstance* ItemInstance, const TArray<FRarityStatRangeSet>& RarityStatRangeSets) const;
+	void AddStatTagStack(UPanItemInstance* ItemInstance, const TArray<FRarityStatSet>& RarityStatSets) const;
+	void AddStatTagStack(UPanItemInstance* ItemInstance, const TArray<FRarityStatRangeSet>& RarityStatRangeSets) const;
 
 public:
 	bool IsEquipableClassType(ECharacterClassType ClassType) const;

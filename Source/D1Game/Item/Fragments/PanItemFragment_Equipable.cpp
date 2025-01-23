@@ -1,8 +1,8 @@
-﻿#include "D1ItemFragment_Equipable.h"
+﻿#include "PanItemFragment_Equipable.h"
 
-#include "Item/D1ItemInstance.h"
+#include "Item/PanItemInstance.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(D1ItemFragment_Equipable)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(PanItemFragment_Equipable)
 
 FRarityStatSet::FRarityStatSet()
 {
@@ -22,13 +22,13 @@ FRarityStatRangeSet::FRarityStatRangeSet()
 	}
 }
 
-UD1ItemFragment_Equipable::UD1ItemFragment_Equipable(const FObjectInitializer& ObjectInitializer)
+UPanItemFragment_Equipable::UPanItemFragment_Equipable(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
     
 }
 
-void UD1ItemFragment_Equipable::AddStatTagStack(UD1ItemInstance* ItemInstance, const TArray<FRarityStatSet>& RarityStatSets) const
+void UPanItemFragment_Equipable::AddStatTagStack(UPanItemInstance* ItemInstance, const TArray<FRarityStatSet>& RarityStatSets) const
 {
 	if (ItemInstance == nullptr)
 		return;
@@ -41,7 +41,7 @@ void UD1ItemFragment_Equipable::AddStatTagStack(UD1ItemInstance* ItemInstance, c
 	}
 }
 
-void UD1ItemFragment_Equipable::AddStatTagStack(UD1ItemInstance* ItemInstance, const TArray<FRarityStatRangeSet>& RarityStatRangeSets) const
+void UPanItemFragment_Equipable::AddStatTagStack(UPanItemInstance* ItemInstance, const TArray<FRarityStatRangeSet>& RarityStatRangeSets) const
 {
 	if (ItemInstance == nullptr)
 		return;
@@ -55,7 +55,7 @@ void UD1ItemFragment_Equipable::AddStatTagStack(UD1ItemInstance* ItemInstance, c
 	}
 }
 
-bool UD1ItemFragment_Equipable::IsEquipableClassType(ECharacterClassType ClassType) const
+bool UPanItemFragment_Equipable::IsEquipableClassType(ECharacterClassType ClassType) const
 {
 	return (EquipableClassFlags & (1 << (uint32)ClassType)) != 0;
 }

@@ -1,10 +1,10 @@
-﻿#include "D1ArmorBase.h"
+﻿#include "PanArmorBase.h"
 
 #include "System/LyraAssetManager.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(D1ArmorBase)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(PanArmorBase)
 
-AD1ArmorBase::AD1ArmorBase(const FObjectInitializer& ObjectInitializer)
+APanArmorBase::APanArmorBase(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = false;
@@ -15,7 +15,7 @@ AD1ArmorBase::AD1ArmorBase(const FObjectInitializer& ObjectInitializer)
 	SetRootComponent(ArmorMeshComponent);
 }
 
-void AD1ArmorBase::InitializeActor(TSoftObjectPtr<USkeletalMesh> InDefaultArmorMesh, TSoftObjectPtr<USkeletalMesh> InSecondaryArmorMesh, FName InSkinMaterialSlotName, TSoftObjectPtr<UMaterialInterface> InSkinMaterial)
+void APanArmorBase::InitializeActor(TSoftObjectPtr<USkeletalMesh> InDefaultArmorMesh, TSoftObjectPtr<USkeletalMesh> InSecondaryArmorMesh, FName InSkinMaterialSlotName, TSoftObjectPtr<UMaterialInterface> InSkinMaterial)
 {
 	DefaultArmorMesh = InDefaultArmorMesh;
 	SecondaryArmorMesh = (InSecondaryArmorMesh.IsNull() == false ? InSecondaryArmorMesh : InDefaultArmorMesh);
@@ -29,19 +29,19 @@ void AD1ArmorBase::InitializeActor(TSoftObjectPtr<USkeletalMesh> InDefaultArmorM
 	SetArmorMesh(DefaultArmorMesh);
 }
 
-void AD1ArmorBase::SetPrimaryArmorMesh(USkeletalMesh* InPrimaryArmorMesh)
+void APanArmorBase::SetPrimaryArmorMesh(USkeletalMesh* InPrimaryArmorMesh)
 {
 	PrimaryArmorMesh = InPrimaryArmorMesh;
 	RefreshArmorMesh();
 }
 
-void AD1ArmorBase::ShouldUseSecondaryMesh(bool bInShouldUseSecondary)
+void APanArmorBase::ShouldUseSecondaryMesh(bool bInShouldUseSecondary)
 {
 	bShouldUseSecondaryArmor = bInShouldUseSecondary;
 	RefreshArmorMesh();
 }
 
-void AD1ArmorBase::RefreshArmorMesh()
+void APanArmorBase::RefreshArmorMesh()
 {
 	TSoftObjectPtr<USkeletalMesh> ArmorMesh;
 	if (bShouldUseSecondaryArmor)
@@ -56,7 +56,7 @@ void AD1ArmorBase::RefreshArmorMesh()
 	SetArmorMesh(ArmorMesh);
 }
 
-void AD1ArmorBase::SetArmorMesh(TSoftObjectPtr<USkeletalMesh> InArmorMesh)
+void APanArmorBase::SetArmorMesh(TSoftObjectPtr<USkeletalMesh> InArmorMesh)
 {
 	USkeletalMesh* LoadedArmorMesh = nullptr;
 	if (InArmorMesh.IsNull() == false)

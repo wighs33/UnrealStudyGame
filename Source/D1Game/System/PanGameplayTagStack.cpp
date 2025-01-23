@@ -1,15 +1,15 @@
-#include "D1GameplayTagStack.h"
+#include "PanGameplayTagStack.h"
 
 #include "UObject/Stack.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(D1GameplayTagStack)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(PanGameplayTagStack)
 
-FString FD1GameplayTagStack::GetDebugString() const
+FString FPanGameplayTagStack::GetDebugString() const
 {
 	return FString::Printf(TEXT("%sx%d"), *Tag.ToString(), StackCount);
 }
 
-void FD1GameplayTagStackContainer::AddStack(FGameplayTag Tag, int32 StackCount)
+void FPanGameplayTagStackContainer::AddStack(FGameplayTag Tag, int32 StackCount)
 {
 	if (!Tag.IsValid())
 	{
@@ -17,7 +17,7 @@ void FD1GameplayTagStackContainer::AddStack(FGameplayTag Tag, int32 StackCount)
 		return;
 	}
 
-	for (FD1GameplayTagStack& Stack : Stacks)
+	for (FPanGameplayTagStack& Stack : Stacks)
 	{
 		if (Stack.Tag == Tag)
 		{
@@ -29,12 +29,12 @@ void FD1GameplayTagStackContainer::AddStack(FGameplayTag Tag, int32 StackCount)
 		}
 	}
 
-	FD1GameplayTagStack& NewStack = Stacks.Emplace_GetRef(Tag, StackCount);
+	FPanGameplayTagStack& NewStack = Stacks.Emplace_GetRef(Tag, StackCount);
 	MarkItemDirty(NewStack);
 	TagToCountMap.Add(Tag, StackCount);
 }
 
-void FD1GameplayTagStackContainer::RemoveStack(FGameplayTag Tag)
+void FPanGameplayTagStackContainer::RemoveStack(FGameplayTag Tag)
 {
 	if (!Tag.IsValid())
 	{
@@ -44,7 +44,7 @@ void FD1GameplayTagStackContainer::RemoveStack(FGameplayTag Tag)
 	
 	for (auto It = Stacks.CreateIterator(); It; ++It)
 	{
-		FD1GameplayTagStack& Stack = *It;
+		FPanGameplayTagStack& Stack = *It;
 		if (Stack.Tag == Tag)
 		{
 			It.RemoveCurrent();
@@ -55,7 +55,7 @@ void FD1GameplayTagStackContainer::RemoveStack(FGameplayTag Tag)
 	}
 }
 
-void FD1GameplayTagStackContainer::PreReplicatedRemove(const TArrayView<int32> RemovedIndices, int32 FinalSize)
+void FPanGameplayTagStackContainer::PreReplicatedRemove(const TArrayView<int32> RemovedIndices, int32 FinalSize)
 {
 	for (int32 Index : RemovedIndices)
 	{
@@ -64,20 +64,20 @@ void FD1GameplayTagStackContainer::PreReplicatedRemove(const TArrayView<int32> R
 	}
 }
 
-void FD1GameplayTagStackContainer::PostReplicatedAdd(const TArrayView<int32> AddedIndices, int32 FinalSize)
+void FPanGameplayTagStackContainer::PostReplicatedAdd(const TArrayView<int32> AddedIndices, int32 FinalSize)
 {
 	for (int32 Index : AddedIndices)
 	{
-		const FD1GameplayTagStack& Stack = Stacks[Index];
+		const FPanGameplayTagStack& Stack = Stacks[Index];
 		TagToCountMap.Add(Stack.Tag, Stack.StackCount);
 	}
 }
 
-void FD1GameplayTagStackContainer::PostReplicatedChange(const TArrayView<int32> ChangedIndices, int32 FinalSize)
+void FPanGameplayTagStackContainer::PostReplicatedChange(const TArrayView<int32> ChangedIndices, int32 FinalSize)
 {
 	for (int32 Index : ChangedIndices)
 	{
-		const FD1GameplayTagStack& Stack = Stacks[Index];
+		const FPanGameplayTagStack& Stack = Stacks[Index];
 		TagToCountMap[Stack.Tag] = Stack.StackCount;
 	}
 }

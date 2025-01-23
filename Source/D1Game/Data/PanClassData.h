@@ -1,13 +1,13 @@
 ﻿#pragma once
 
-#include "D1Define.h"
-#include "D1ClassData.generated.h"
+#include "PanDefine.h"
+#include "PanClassData.generated.h"
 
-class UD1ItemTemplate;
+class UPanItemTemplate;
 class ULyraAbilitySet;
 
 USTRUCT(BlueprintType)
-struct FD1DefaultItemEntry
+struct FPanDefaultItemEntry
 {
 	GENERATED_BODY()
 
@@ -16,7 +16,7 @@ public:
 	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;
 
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UD1ItemTemplate> ItemTemplateClass;
+	TSubclassOf<UPanItemTemplate> ItemTemplateClass;
 
 	UPROPERTY(EditDefaultsOnly)
 	EItemRarity ItemRarity = EItemRarity::Poor;
@@ -26,7 +26,7 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct FD1ClassInfoEntry
+struct FPanClassInfoEntry
 {
 	GENERATED_BODY()
 
@@ -35,24 +35,24 @@ public:
 	FText ClassName;
 
 	UPROPERTY(EditDefaultsOnly)
-	TArray<FD1DefaultItemEntry> DefaultItemEntries;
+	TArray<FPanDefaultItemEntry> DefaultItemEntries;
 	
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<ULyraAbilitySet> ClassAbilitySet;
 };
 
 UCLASS(BlueprintType, Const)
-class UD1ClassData : public UPrimaryDataAsset
+class UPanClassData : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 	
 public:
-	static const UD1ClassData& Get();
+	static const UPanClassData& Get();
 
 public:
-	const FD1ClassInfoEntry& GetClassInfoEntry(ECharacterClassType ClassType) const;
+	const FPanClassInfoEntry& GetClassInfoEntry(ECharacterClassType ClassType) const;
 	
 private:
 	UPROPERTY(EditDefaultsOnly, meta=(ArraySizeNum="ECharacterClassType"))
-	FD1ClassInfoEntry ClassInfoEntries[(int32)ECharacterClassType::Count];
+	FPanClassInfoEntry ClassInfoEntries[(int32)ECharacterClassType::Count];
 };

@@ -2,20 +2,20 @@
 
 #include "GameplayTagContainer.h"
 #include "Net/Serialization/FastArraySerializer.h"
-#include "D1GameplayTagStack.generated.h"
+#include "PanGameplayTagStack.generated.h"
 
-struct FD1GameplayTagStackContainer;
+struct FPanGameplayTagStackContainer;
 struct FNetDeltaSerializeInfo;
 
 USTRUCT(BlueprintType)
-struct FD1GameplayTagStack : public FFastArraySerializerItem
+struct FPanGameplayTagStack : public FFastArraySerializerItem
 {
 	GENERATED_BODY()
 
 public:
-	FD1GameplayTagStack() { }
+	FPanGameplayTagStack() { }
 
-	FD1GameplayTagStack(FGameplayTag InTag, int32 InStackCount)
+	FPanGameplayTagStack(FGameplayTag InTag, int32 InStackCount)
 		: Tag(InTag)
 		, StackCount(InStackCount) { }
 
@@ -26,7 +26,7 @@ public:
 	FString GetDebugString() const;
 	
 private:
-	friend FD1GameplayTagStackContainer;
+	friend FPanGameplayTagStackContainer;
 
 	UPROPERTY()
 	FGameplayTag Tag;
@@ -36,19 +36,19 @@ private:
 };
 
 USTRUCT(BlueprintType)
-struct FD1GameplayTagStackContainer : public FFastArraySerializer
+struct FPanGameplayTagStackContainer : public FFastArraySerializer
 {
 	GENERATED_BODY()
 
 public:
-	FD1GameplayTagStackContainer() { }
+	FPanGameplayTagStackContainer() { }
 
 public:
 	void AddStack(FGameplayTag Tag, int32 StackCount);
 	void RemoveStack(FGameplayTag Tag);
 
 public:
-	const TArray<FD1GameplayTagStack>& GetStacks() const { return Stacks; }
+	const TArray<FPanGameplayTagStack>& GetStacks() const { return Stacks; }
 	
 	int32 GetStackCount(FGameplayTag Tag) const { return TagToCountMap.FindRef(Tag); }
 	bool ContainsTag(FGameplayTag Tag) const { return TagToCountMap.Contains(Tag); }
@@ -59,19 +59,19 @@ public:
 
 	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParms)
 	{
-		return FFastArraySerializer::FastArrayDeltaSerialize<FD1GameplayTagStack, FD1GameplayTagStackContainer>(Stacks, DeltaParms, *this);
+		return FFastArraySerializer::FastArrayDeltaSerialize<FPanGameplayTagStack, FPanGameplayTagStackContainer>(Stacks, DeltaParms, *this);
 	}
 
 private:
 	UPROPERTY()
-	TArray<FD1GameplayTagStack> Stacks;
+	TArray<FPanGameplayTagStack> Stacks;
 
 	UPROPERTY(NotReplicated)
 	TMap<FGameplayTag, int32> TagToCountMap;
 };
 
 template<>
-struct TStructOpsTypeTraits<FD1GameplayTagStackContainer> : public TStructOpsTypeTraitsBase2<FD1GameplayTagStackContainer>
+struct TStructOpsTypeTraits<FPanGameplayTagStackContainer> : public TStructOpsTypeTraitsBase2<FPanGameplayTagStackContainer>
 {
 	enum
 	{

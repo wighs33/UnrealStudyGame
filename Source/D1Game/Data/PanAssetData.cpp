@@ -1,4 +1,4 @@
-﻿#include "D1AssetData.h"
+﻿#include "PanAssetData.h"
 
 #include "UObject/ObjectSaveContext.h"
 
@@ -8,15 +8,15 @@
 
 #include "System/LyraAssetManager.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(D1AssetData)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(PanAssetData)
 
-const UD1AssetData& UD1AssetData::Get()
+const UPanAssetData& UPanAssetData::Get()
 {
 	return ULyraAssetManager::Get().GetAssetData();
 }
 
 #if WITH_EDITOR
-void UD1AssetData::PreSave(FObjectPreSaveContext ObjectSaveContext)
+void UPanAssetData::PreSave(FObjectPreSaveContext ObjectSaveContext)
 {
 	Super::PreSave(ObjectSaveContext);
 
@@ -42,7 +42,7 @@ void UD1AssetData::PreSave(FObjectPreSaveContext ObjectSaveContext)
 	}
 }
 
-EDataValidationResult UD1AssetData::IsDataValid(FDataValidationContext& Context) const
+EDataValidationResult UPanAssetData::IsDataValid(FDataValidationContext& Context) const
 {
 	EDataValidationResult Result = Super::IsDataValid(Context);
 
@@ -70,14 +70,14 @@ EDataValidationResult UD1AssetData::IsDataValid(FDataValidationContext& Context)
 }
 #endif // WITH_EDITOR
 
-FSoftObjectPath UD1AssetData::GetAssetPathByName(const FName& AssetName) const
+FSoftObjectPath UPanAssetData::GetAssetPathByName(const FName& AssetName) const
 {
 	const FSoftObjectPath* AssetPath = AssetNameToPath.Find(AssetName);
 	ensureAlwaysMsgf(AssetPath, TEXT("Can't find Asset Path from Asset Name [%s]."), *AssetName.ToString());
 	return *AssetPath;
 }
 
-const FAssetSet& UD1AssetData::GetAssetSetByLabel(const FName& Label) const
+const FAssetSet& UPanAssetData::GetAssetSetByLabel(const FName& Label) const
 {
 	const FAssetSet* AssetSet = AssetLabelToSet.Find(Label);
 	ensureAlwaysMsgf(AssetSet, TEXT("Can't find Asset Set from Label [%s]."), *Label.ToString());

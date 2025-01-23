@@ -4,10 +4,10 @@
 #include "LyraLogChannels.h"
 #include "LyraGameplayTags.h"
 #include "LyraGameData.h"
-#include "Data/D1CharacterData.h"
-#include "Data/D1ItemData.h"
-#include "Data/D1ClassData.h"
-#include "Data/D1AssetData.h"
+#include "Data/PanCharacterData.h"
+#include "Data/PanItemData.h"
+#include "Data/PanClassData.h"
+#include "Data/PanAssetData.h"
 #include "AbilitySystemGlobals.h"
 #include "Character/LyraPawnData.h"
 #include "Misc/App.h"
@@ -149,24 +149,24 @@ const ULyraPawnData* ULyraAssetManager::GetDefaultPawnData() const
 	return GetAssetByPath(DefaultPawnData);
 }
 
-const UD1CharacterData& ULyraAssetManager::GetCharacterData()
+const UPanCharacterData& ULyraAssetManager::GetCharacterData()
 {
-	return GetOrLoadTypedGameData<UD1CharacterData>(CharacterDataPath);
+	return GetOrLoadTypedGameData<UPanCharacterData>(CharacterDataPath);
 }
 
-const UD1ItemData& ULyraAssetManager::GetItemData()
+const UPanItemData& ULyraAssetManager::GetItemData()
 {
-	return GetOrLoadTypedGameData<UD1ItemData>(ItemDataPath);
+	return GetOrLoadTypedGameData<UPanItemData>(ItemDataPath);
 }
 
-const UD1ClassData& ULyraAssetManager::GetClassData()
+const UPanClassData& ULyraAssetManager::GetClassData()
 {
-	return GetOrLoadTypedGameData<UD1ClassData>(ClassDataPath);
+	return GetOrLoadTypedGameData<UPanClassData>(ClassDataPath);
 }
 
-const UD1AssetData& ULyraAssetManager::GetAssetData()
+const UPanAssetData& ULyraAssetManager::GetAssetData()
 {
-	return GetOrLoadTypedGameData<UD1AssetData>(AssetDataPath);
+	return GetOrLoadTypedGameData<UPanAssetData>(AssetDataPath);
 }
 
 UPrimaryDataAsset* ULyraAssetManager::LoadGameDataOfClass(TSubclassOf<UPrimaryDataAsset> DataClass, const TSoftObjectPtr<UPrimaryDataAsset>& DataClassPath, FPrimaryAssetType PrimaryAssetType)

@@ -1,16 +1,16 @@
 ﻿#pragma once
 
-#include "D1Define.h"
-#include "D1ItemFragment_Equipable_Attachment.h"
-#include "D1ItemFragment_Equipable_Weapon.generated.h"
+#include "PanDefine.h"
+#include "PanItemFragment_Equipable_Attachment.h"
+#include "PanItemFragment_Equipable_Weapon.generated.h"
 
 UCLASS()
-class UD1ItemFragment_Equipable_Weapon : public UD1ItemFragment_Equipable_Attachment
+class UPanItemFragment_Equipable_Weapon : public UPanItemFragment_Equipable_Attachment
 {
 	GENERATED_BODY()
 	
 public:
-	UD1ItemFragment_Equipable_Weapon(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UPanItemFragment_Equipable_Weapon(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
 #if WITH_EDITORONLY_DATA
@@ -18,7 +18,7 @@ protected:
 #endif // WITH_EDITORONLY_DATA
 	
 public:
-	virtual void OnInstanceCreated(UD1ItemInstance* ItemInstance) const override;
+	virtual void OnInstanceCreated(UPanItemInstance* ItemInstance) const override;
 	
 public:
 	UPROPERTY(EditDefaultsOnly)

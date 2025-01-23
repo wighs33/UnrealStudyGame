@@ -6,7 +6,7 @@
 #include "ModularPlayerState.h"
 #include "System/GameplayTagStack.h"
 #include "Teams/LyraTeamAgentInterface.h"
-#include "D1Define.h"
+#include "PanDefine.h"
 #include "LyraPlayerState.generated.h"
 
 struct FLyraVerbMessage;

@@ -1,26 +1,26 @@
 ﻿#pragma once
 
-#include "D1Define.h"
+#include "PanDefine.h"
 #include "Components/PawnComponent.h"
-#include "D1CosmeticManagerComponent.generated.h"
+#include "PanCosmeticManagerComponent.generated.h"
 
-class AD1ArmorBase;
-//class UD1ItemFragment_Equipable_Armor;
+class APanArmorBase;
+//class UPanItemFragment_Equipable_Armor;
 
 UCLASS(BlueprintType, Blueprintable)
-class UD1CosmeticManagerComponent : public UPawnComponent
+class UPanCosmeticManagerComponent : public UPawnComponent
 {
 	GENERATED_BODY()
 	
 public:
-	UD1CosmeticManagerComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UPanCosmeticManagerComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	
 public:
-	void RefreshArmorMesh(EArmorType ArmorType /*, const UD1ItemFragment_Equipable_Armor* ArmorFragment*/);
+	void RefreshArmorMesh(EArmorType ArmorType /*, const UPanItemFragment_Equipable_Armor* ArmorFragment*/);
 	void GetMeshComponents(TArray<UMeshComponent*>& OutMeshComponents) const;
 
 private:
@@ -34,7 +34,7 @@ protected:
 	ECharacterSkinType CharacterSkinType = ECharacterSkinType::Asian;
 	
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<AD1ArmorBase> CosmeticSlotClass;
+	TSubclassOf<APanArmorBase> CosmeticSlotClass;
 
 private:
 	UPROPERTY()
