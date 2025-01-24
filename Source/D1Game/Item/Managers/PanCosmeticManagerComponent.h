@@ -7,6 +7,7 @@
 class APanArmorBase;
 //class UPanItemFragment_Equipable_Armor;
 
+// 캐릭터 겉치장 관리 컴포넌트
 UCLASS(BlueprintType, Blueprintable)
 class UPanCosmeticManagerComponent : public UPawnComponent
 {
@@ -30,16 +31,20 @@ private:
 	void SetPrimaryArmorMesh(EArmorType ArmorType, TSoftObjectPtr<USkeletalMesh> ArmorMeshPtr);
 	
 protected:
+	// 피부타입
 	UPROPERTY(EditDefaultsOnly)
 	ECharacterSkinType CharacterSkinType = ECharacterSkinType::Asian;
 	
+	// 치장 슬롯 리소스
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<APanArmorBase> CosmeticSlotClass;
 
 private:
 	UPROPERTY()
+	// 머리 슬롯
 	TObjectPtr<UChildActorComponent> HeadSlot;
 	
+	// 치장 슬롯
 	UPROPERTY()
 	TArray<TObjectPtr<UChildActorComponent>> CosmeticSlots;
 
