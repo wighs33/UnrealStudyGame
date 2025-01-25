@@ -4,6 +4,7 @@
 
 class UPanItemTemplate;
 
+// 아이템 데이터 (싱글턴)
 UCLASS(BlueprintType, Const, meta=(DisplayName="Pan Item Data"))
 class UPanItemData : public UPrimaryDataAsset
 {
@@ -30,16 +31,20 @@ public:
 	const TArray<TSubclassOf<UPanItemTemplate>>& GetArmorItemTemplateClasses() const { return ArmorItemTemplateClasses; }
 	
 private:
+	// [아이템 아이디] - [아이템 템플릿 클래스] 리스트
 	UPROPERTY(EditDefaultsOnly)
 	TMap<int32, TSubclassOf<UPanItemTemplate>> ItemTemplateIDToClass;
 
+	// [아이템 템플릿 클래스] - [아이템 아이디] 리스트
 	UPROPERTY()
 	TMap<TSubclassOf<UPanItemTemplate>, int32> ItemTemplateClassToID;
 
 private:
+	// 무기 모음
 	UPROPERTY()
 	TArray<TSubclassOf<UPanItemTemplate>> WeaponItemTemplateClasses;
 
+	// 갑옷 모음
 	UPROPERTY()
 	TArray<TSubclassOf<UPanItemTemplate>> ArmorItemTemplateClasses;
 };

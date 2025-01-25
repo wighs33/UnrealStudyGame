@@ -1,5 +1,6 @@
 #pragma once
 
+// 슬롯 상태
 UENUM(BlueprintType)
 enum class ESlotState : uint8
 {
@@ -8,6 +9,7 @@ enum class ESlotState : uint8
 	Valid
 };
 
+// 장비 슬롯 타입
 UENUM(BlueprintType)
 enum class EEquipmentSlotType : uint8
 {
@@ -36,6 +38,7 @@ enum class EEquipmentSlotType : uint8
 	Count	UMETA(Hidden)
 };
 
+// 장비 상태
 UENUM(BlueprintType)
 enum class EEquipState : uint8
 {
@@ -52,6 +55,7 @@ enum class EEquipState : uint8
 	Count	UMETA(Hidden)
 };
 
+// 장비 타입
 UENUM(BlueprintType)
 enum class EEquipmentType : uint8
 {
@@ -62,6 +66,7 @@ enum class EEquipmentType : uint8
 	Count	UMETA(Hidden)
 };
 
+// 갑옷 타입
 UENUM(BlueprintType)
 enum class EArmorType : uint8
 {
@@ -74,6 +79,7 @@ enum class EArmorType : uint8
 	Count	UMETA(Hidden)
 };
 
+// 무기 타입
 UENUM(BlueprintType)
 enum class EWeaponType : uint8
 {
@@ -88,6 +94,7 @@ enum class EWeaponType : uint8
 	Count	UMETA(Hidden)
 };
 
+// 무기 슬롯 타입
 UENUM(BlueprintType)
 enum class EWeaponSlotType : uint8
 {
@@ -97,6 +104,7 @@ enum class EWeaponSlotType : uint8
 	Count	UMETA(Hidden)
 };
 
+// 무기 장착 방식
 UENUM(BlueprintType)
 enum class EWeaponHandType : uint8
 {
@@ -107,6 +115,7 @@ enum class EWeaponHandType : uint8
 	Count	UMETA(Hidden)
 };
 
+// 아이템 기능 타입
 UENUM(BlueprintType)
 enum class EUtilityType : uint8
 {
@@ -116,6 +125,7 @@ enum class EUtilityType : uint8
 	Count	UMETA(Hidden)
 };
 
+// 아이템 슬롯 타입
 UENUM(BlueprintType)
 enum class EUtilitySlotType : uint8
 {
@@ -127,6 +137,7 @@ enum class EUtilitySlotType : uint8
 	Count	UMETA(Hidden)
 };
 
+// 아이템 레어도
 UENUM(BlueprintType)
 enum class EItemRarity : uint8
 {
@@ -158,6 +169,7 @@ enum class EOverlayTargetType : uint8
 	All,
 };
 
+// 캐릭터 피부 타입
 UENUM(BlueprintType)
 enum class ECharacterSkinType : uint8
 {
@@ -167,6 +179,7 @@ enum class ECharacterSkinType : uint8
 	Count	UMETA(Hidden)
 };
 
+// 캐릭터 직업 타입
 UENUM(BlueprintType, meta=(Bitflags))
 enum class ECharacterClassType : uint8
 {

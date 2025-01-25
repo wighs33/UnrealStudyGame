@@ -12,12 +12,14 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(PanItemData)
 
+// 애셋매니저에서 가져오기
 const UPanItemData& UPanItemData::Get()
 {
 	return ULyraAssetManager::Get().GetItemData();
 }
 
 #if WITH_EDITORONLY_DATA
+// 자동 저장 전 프로퍼티 초기화
 void UPanItemData::PreSave(FObjectPreSaveContext SaveContext)
 {
 	Super::PreSave(SaveContext);
@@ -31,8 +33,10 @@ void UPanItemData::PreSave(FObjectPreSaveContext SaveContext)
 	WeaponItemTemplateClasses.Empty();
 	ArmorItemTemplateClasses.Empty();
 	
+	// 분류된 ItemTemplateIDToClass 기반
 	for (const auto& Pair : ItemTemplateIDToClass)
 	{
+		// ItemTemplateClassToID 채우기
 		ItemTemplateClassToID.Emplace(Pair.Value, Pair.Key);
 
 		const UPanItemTemplate* ItemTemplate = Pair.Value.GetDefaultObject();
@@ -40,11 +44,13 @@ void UPanItemData::PreSave(FObjectPreSaveContext SaveContext)
 		{
 			if (WeaponFragment->WeaponType != EWeaponType::Unarmed)
 			{
+				// WeaponItemTemplateClasses 채우기
 				WeaponItemTemplateClasses.Add(Pair.Value);
 			}
 		}
 		else if (ItemTemplate->FindFragmentByClass<UPanItemFragment_Equipable_Armor>())
 		{
+			// ArmorItemTemplateClasses 채우기
 			ArmorItemTemplateClasses.Add(Pair.Value);
 		}
 	}
@@ -52,6 +58,7 @@ void UPanItemData::PreSave(FObjectPreSaveContext SaveContext)
 #endif // WITH_EDITORONLY_DATA
 
 #if WITH_EDITOR
+// 데이터 유효성 체크
 EDataValidationResult UPanItemData::IsDataValid(FDataValidationContext& Context) const
 {
 	EDataValidationResult Result = Super::IsDataValid(Context);
@@ -70,6 +77,7 @@ EDataValidationResult UPanItemData::IsDataValid(FDataValidationContext& Context)
 			Result = EDataValidationResult::Invalid;
 		}
 		
+		// 중복체크
 		if (ItemTemplateIDSet.Contains(ItemTemplateID))
 		{
 			Context.AddError(FText::FromString(FString::Printf(TEXT("Duplicated ID : [ID : %d]\n"), ItemTemplateID)));
@@ -99,6 +107,7 @@ EDataValidationResult UPanItemData::IsDataValid(FDataValidationContext& Context)
 }
 #endif // WITH_EDITOR
 
+// 아이템 아이디로 클래스 찾기
 const UPanItemTemplate& UPanItemData::FindItemTemplateByID(int32 ItemTemplateID) const
 {
 	const TSubclassOf<UPanItemTemplate>* ItemTemplateClass = ItemTemplateIDToClass.Find(ItemTemplateID);
@@ -106,6 +115,7 @@ const UPanItemTemplate& UPanItemData::FindItemTemplateByID(int32 ItemTemplateID)
 	return *(ItemTemplateClass->GetDefaultObject());
 }
 
+// 아이템 클래스로 아이디 찾기
 int32 UPanItemData::FindItemTemplateIDByClass(TSubclassOf<UPanItemTemplate> ItemTemplateClass) const
 {
 	const int32* ItemTemplateID = ItemTemplateClassToID.Find(ItemTemplateClass);
@@ -113,6 +123,7 @@ int32 UPanItemData::FindItemTemplateIDByClass(TSubclassOf<UPanItemTemplate> Item
 	return *ItemTemplateID;
 }
 
+// 모든 아이템 템플릿 클래스 얻기
 void UPanItemData::GetAllItemTemplateClasses(TArray<TSubclassOf<UPanItemTemplate>>& OutItemTemplateClasses) const
 {
 	OutItemTemplateClasses.Reset();
