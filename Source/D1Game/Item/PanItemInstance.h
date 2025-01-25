@@ -77,12 +77,15 @@ private:
 #endif // UE_WITH_IRIS
 	
 private:
+	// 아이템 템플릿 아이디
 	UPROPERTY(Replicated)
 	int32 ItemTemplateID = INDEX_NONE;
 
+	// 아이템 레어도
 	UPROPERTY(Replicated)
 	EItemRarity ItemRarity = EItemRarity::Poor;
 	
+	// 스탯 컨테이너
 	UPROPERTY(Replicated)
 	FPanGameplayTagStackContainer StatContainer;
 };

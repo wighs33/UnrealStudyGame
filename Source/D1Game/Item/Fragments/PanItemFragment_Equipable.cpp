@@ -4,6 +4,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(PanItemFragment_Equipable)
 
+// 생성자
 FRarityStatSet::FRarityStatSet()
 {
 	RarityStats.SetNum((int32)EItemRarity::Count);
@@ -13,6 +14,7 @@ FRarityStatSet::FRarityStatSet()
 	}
 }
 
+// 생성자
 FRarityStatRangeSet::FRarityStatRangeSet()
 {
 	RarityStatRanges.SetNum((int32)EItemRarity::Count);
@@ -22,12 +24,14 @@ FRarityStatRangeSet::FRarityStatRangeSet()
 	}
 }
 
+// 생성자
 UPanItemFragment_Equipable::UPanItemFragment_Equipable(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
     
 }
 
+// 스탯을 통해 스택 추가
 void UPanItemFragment_Equipable::AddStatTagStack(UPanItemInstance* ItemInstance, const TArray<FRarityStatSet>& RarityStatSets) const
 {
 	if (ItemInstance == nullptr)
@@ -37,10 +41,12 @@ void UPanItemFragment_Equipable::AddStatTagStack(UPanItemInstance* ItemInstance,
 	{
 		const FGameplayTag& StatTag = RarityStatSet.StatTag;
 		const FRarityStat& Stat = RarityStatSet.RarityStats[(int32)ItemInstance->GetItemRarity()];
+		// 아이템 인스턴스에서 스탯과 태그로 스택 추가
 		ItemInstance->AddStatTagStack(StatTag, Stat.Value);
 	}
 }
 
+// 스탯 범위를 통해 스택 추가
 void UPanItemFragment_Equipable::AddStatTagStack(UPanItemInstance* ItemInstance, const TArray<FRarityStatRangeSet>& RarityStatRangeSets) const
 {
 	if (ItemInstance == nullptr)
@@ -55,6 +61,7 @@ void UPanItemFragment_Equipable::AddStatTagStack(UPanItemInstance* ItemInstance,
 	}
 }
 
+// 착용가능 클래스 타입인지
 bool UPanItemFragment_Equipable::IsEquipableClassType(ECharacterClassType ClassType) const
 {
 	return (EquipableClassFlags & (1 << (uint32)ClassType)) != 0;

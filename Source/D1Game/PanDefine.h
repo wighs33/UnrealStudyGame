@@ -115,7 +115,7 @@ enum class EWeaponHandType : uint8
 	Count	UMETA(Hidden)
 };
 
-// 아이템 기능 타입
+// 아이템 용도 타입
 UENUM(BlueprintType)
 enum class EUtilityType : uint8
 {
