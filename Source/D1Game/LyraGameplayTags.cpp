@@ -210,6 +210,7 @@ namespace LyraGameplayTags
 
 	const TMap<uint8, FGameplayTag> CustomMovementModeTagMap = {};
 
+	// 태그문자열을 통해 태그 얻기
 	FGameplayTag FindTagByString(const FString& TagString, bool bMatchPartialString)
 	{
 		const UGameplayTagsManager& Manager = UGameplayTagsManager::Get();

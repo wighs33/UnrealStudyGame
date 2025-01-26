@@ -5,19 +5,23 @@
 #include "System/PanGameplayTagStack.h"
 #include "PanItemInstance.generated.h"
 
+// 아이템 레어도 별 등장 확률
 USTRUCT(BlueprintType)
 struct FPanItemRarityProbability
 {
 	GENERATED_BODY()
 
 public:
+	// 레어도
 	UPROPERTY(VisibleAnywhere)
 	EItemRarity Rarity = EItemRarity::Poor;
 
+	// 등장 확률
 	UPROPERTY(EditAnywhere)
 	float Probability = 0;
 };
 
+// 아이템 정보
 UCLASS(BlueprintType)
 class UPanItemInstance : public UObject, public ILyraAbilitySourceInterface
 {

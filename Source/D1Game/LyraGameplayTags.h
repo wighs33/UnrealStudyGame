@@ -196,6 +196,7 @@ namespace LyraGameplayTags
 	// HUD
 	D1GAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(HUD_Slot_Reticle);
 
+	// 이동 모드
 	D1GAME_API	extern const TMap<uint8, FGameplayTag> MovementModeTagMap;
 	D1GAME_API	extern const TMap<uint8, FGameplayTag> CustomMovementModeTagMap;
 
