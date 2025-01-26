@@ -302,6 +302,7 @@ void ALyraPlayerState::ClientBroadcastMessage_Implementation(const FLyraVerbMess
 	}
 }
 
+// 직업 선택
 void ALyraPlayerState::Server_SelectClass_Implementation(ECharacterClassType ClassType)
 {
 	if (HasAuthority() == false)
@@ -311,6 +312,7 @@ void ALyraPlayerState::Server_SelectClass_Implementation(ECharacterClassType Cla
 		return;
 
 	CharacterClassType = ClassType;
+	// 직업 정보 엔트리 얻기
 	const FPanClassInfoEntry& ClassEntry = UPanClassData::Get().GetClassInfoEntry(CharacterClassType);
 
 	if (ALyraCharacter* LyraCharacter = GetPawn<ALyraCharacter>())
@@ -319,6 +321,7 @@ void ALyraPlayerState::Server_SelectClass_Implementation(ECharacterClassType Cla
 		{
 			for (const FPanDefaultItemEntry& DefaultItemEntry : ClassEntry.DefaultItemEntries)
 			{
+				// [직업 정보 엔트리]에서 [기본 아이템 목록]얻고 전부 [장비 매니저]에 등록
 				EquipmentManager->SetEquipment(DefaultItemEntry.EquipmentSlotType, DefaultItemEntry.ItemTemplateClass, DefaultItemEntry.ItemRarity, DefaultItemEntry.ItemCount);
 			}
 		}

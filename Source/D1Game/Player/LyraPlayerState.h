@@ -187,6 +187,7 @@ public:
 	void Server_SelectClass(ECharacterClassType ClassType);
 
 public:
+	// 캐릭터 직업 타입
 	UPROPERTY(Replicated)
 	ECharacterClassType CharacterClassType = ECharacterClassType::Count;
 };

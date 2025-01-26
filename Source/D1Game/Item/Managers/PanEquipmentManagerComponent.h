@@ -15,6 +15,7 @@ class UPanItemTemplate;
 
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnEquipmentEntryChanged, EEquipmentSlotType, UPanItemInstance*, int32/*ItemCount*/);
 
+// 장비 엔트리 (싱글턴)
 USTRUCT(BlueprintType)
 struct FPanEquipmentEntry : public FFastArraySerializerItem
 {
@@ -33,20 +34,25 @@ private:
 	friend class UPanEquipmentManagerComponent;
 	friend class UPanItemManagerComponent;
 
+	// 아이템 인스턴스
 	UPROPERTY()
 	TObjectPtr<UPanItemInstance> ItemInstance;
 
+	// 아이템 개수
 	UPROPERTY()
 	int32 ItemCount = 0;
 
 private:
+	// 장비 슬롯 타입
 	UPROPERTY(NotReplicated)
 	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;
 	
+	// 장비 매니저
 	UPROPERTY(NotReplicated)
 	TObjectPtr<UPanEquipmentManagerComponent> EquipmentManager;
 };
 
+// 장비 리스트
 USTRUCT(BlueprintType)
 struct FPanEquipmentList : public FFastArraySerializer
 {
@@ -72,9 +78,11 @@ private:
 	friend class UPanInventoryManagerComponent;
 	friend class UPanItemManagerComponent;
 
+	// 장비 엔트리 모음
 	UPROPERTY()
 	TArray<FPanEquipmentEntry> Entries;
 	
+	// 장비 매니저
 	UPROPERTY(NotReplicated)
 	TObjectPtr<UPanEquipmentManagerComponent> EquipmentManager;
 };
@@ -88,6 +96,7 @@ struct TStructOpsTypeTraits<FPanEquipmentList> : public TStructOpsTypeTraitsBase
 	};
 };
 
+// 장비 매니저 컴포넌트
 UCLASS(BlueprintType)
 class UPanEquipmentManagerComponent : public UPawnComponent
 {
@@ -156,12 +165,14 @@ public:
 	void GetAllWeaponItemInstances(TArray<UPanItemInstance*>& OutItemInstances) const;
 
 public:
+	// 장비 엔트리 변화 시점
 	FOnEquipmentEntryChanged OnEquipmentEntryChanged;
 	
 private:
 	friend class UPanItemManagerComponent;
 	friend class ULyraCheatManager;
 	
+	// 장비 리스트
 	UPROPERTY(Replicated)
 	FPanEquipmentList EquipmentList;
 };

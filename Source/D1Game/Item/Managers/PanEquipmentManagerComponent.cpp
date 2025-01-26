@@ -15,6 +15,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(PanEquipmentManagerComponent)
 
+// 초기화
 void FPanEquipmentEntry::Init(UPanItemInstance* InItemInstance, int32 InItemCount)
 {
 	check(InItemInstance && InItemCount > 0);
@@ -43,6 +44,7 @@ void FPanEquipmentEntry::Init(UPanItemInstance* InItemInstance, int32 InItemCoun
 	}
 }
 
+// 프로퍼티에 값 비우기
 UPanItemInstance* FPanEquipmentEntry::Reset()
 {
 	/*UPanEquipManagerComponent* EquipManager = EquipmentManager->GetEquipManager();
@@ -103,23 +105,29 @@ void FPanEquipmentList::BroadcastChangedMessage(EEquipmentSlotType EquipmentSlot
 	}
 }
 
+// 생성자
 UPanEquipmentManagerComponent::UPanEquipmentManagerComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 	, EquipmentList(this)
 {
 	bWantsInitializeComponent = true;
+	// 동기화 허용
     SetIsReplicatedByDefault(true);
 }
 
+// 컴포넌트 초기화
 void UPanEquipmentManagerComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
 	
+	// 서버에서만
 	if (GetOwner() && GetOwner()->HasAuthority())
 	{
 		TArray<FPanEquipmentEntry>& Entries = EquipmentList.Entries;
+		// 장비 모음의 여유 공간
 		Entries.SetNum((int32)EEquipmentSlotType::Count);
 
+		// 엔트리마다 변경사항 다시 동기화
 		for (int32 i = 0; i < Entries.Num(); i++)
 		{
 			FPanEquipmentEntry& Entry = Entries[i];
@@ -130,6 +138,7 @@ void UPanEquipmentManagerComponent::InitializeComponent()
 	}
 }
 
+// 동기화할 프로퍼티 등록
 void UPanEquipmentManagerComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -285,6 +294,7 @@ void UPanEquipmentManagerComponent::AddEquipment_Unsafe(EEquipmentSlotType Equip
 	}
 }
 
+// 장비 착용
 void UPanEquipmentManagerComponent::SetEquipment(EEquipmentSlotType EquipmentSlotType, TSubclassOf<UPanItemTemplate> ItemTemplateClass, EItemRarity ItemRarity, int32 ItemCount)
 {
 	check(HasAuthority());
@@ -293,22 +303,28 @@ void UPanEquipmentManagerComponent::SetEquipment(EEquipmentSlotType EquipmentSlo
 		return;
 	
 	const int32 ItemTemplateID = UPanItemData::Get().FindItemTemplateIDByClass(ItemTemplateClass);
+	// 클래스로 아이디찾고 아이디로 템플릿 찾기
 	const UPanItemTemplate& ItemTemplate = UPanItemData::Get().FindItemTemplateByID(ItemTemplateID);
 
 	ItemCount = FMath::Clamp(ItemCount, 1, ItemTemplate.MaxStackCount);
 	
+	// 템플릿에서 프래그먼트 찾기
 	const UPanItemFragment_Equipable* EquippableFragment = ItemTemplate.FindFragmentByClass<UPanItemFragment_Equipable>();
 	if (EquippableFragment == nullptr)
 		return;
 
+	// 엔트리 비우기
 	FPanEquipmentEntry& Entry = EquipmentList.Entries[(int32)EquipmentSlotType];
 	Entry.Reset();
 	
+	// 프래그먼트가 무기일 때
 	if (EquippableFragment->EquipmentType == EEquipmentType::Weapon)
 	{
+		// 핸드 타입
 		const UPanItemFragment_Equipable_Weapon* WeaponFragment = Cast<UPanItemFragment_Equipable_Weapon>(EquippableFragment);
 		EWeaponHandType WeaponHandType = WeaponFragment->WeaponHandType;
 
+		// 주요 무기 슬롯이라면ㅋ
 		if (IsPrimaryWeaponSlot(EquipmentSlotType))
 		{
 			if (WeaponHandType == EWeaponHandType::LeftHand || WeaponHandType == EWeaponHandType::RightHand)
@@ -321,6 +337,7 @@ void UPanEquipmentManagerComponent::SetEquipment(EEquipmentSlotType EquipmentSlo
 				RemoveEquipment_Unsafe(EEquipmentSlotType::Primary_RightHand, 1);
 			}
 		}
+		// 보조 무기 슬롯이라면
 		else if (IsSecondaryWeaponSlot(EquipmentSlotType))
 		{
 			if (WeaponHandType == EWeaponHandType::LeftHand || WeaponHandType == EWeaponHandType::RightHand)
@@ -337,13 +354,16 @@ void UPanEquipmentManagerComponent::SetEquipment(EEquipmentSlotType EquipmentSlo
 
 	UPanItemInstance* AddedItemInstance = NewObject<UPanItemInstance>();
 	AddedItemInstance->Init(ItemTemplateID, ItemRarity);
+	// 아이템 인스턴스를 장비 엔트리에 추가
 	Entry.Init(AddedItemInstance, ItemCount);
 
 	if (IsUsingRegisteredSubObjectList() && IsReadyForReplication() && AddedItemInstance)
 	{
+		//AddedItemInstance도 동기화
 		AddReplicatedSubObject(AddedItemInstance);
 	}
 	
+	// 변경사항 동기화
 	EquipmentList.MarkItemDirty(Entry);
 
 	if (IsWeaponSlot(EquipmentSlotType))
