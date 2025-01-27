@@ -1,9 +1,9 @@
 ﻿#pragma once
 
 #include "AbilitySystemInterface.h"
-#include "D1Define.h"
+#include "PanDefine.h"
 #include "AbilitySystem/LyraAbilitySet.h"
-#include "D1EquipmentBase.generated.h"
+#include "PanEquipmentBase.generated.h"
 
 class UAbilitySystemComponent;
 class USkeletalMeshComponent;
@@ -11,12 +11,12 @@ class UArrowComponent;
 class UBoxComponent;
 
 UCLASS(BlueprintType, Abstract)
-class AD1EquipmentBase : public AActor, public IAbilitySystemInterface
+class APanEquipmentBase : public AActor, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 	
 public:
-	AD1EquipmentBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	APanEquipmentBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
 	virtual void BeginPlay() override;

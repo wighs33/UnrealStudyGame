@@ -5,7 +5,7 @@
 #include "PanCosmeticManagerComponent.generated.h"
 
 class APanArmorBase;
-//class UPanItemFragment_Equipable_Armor;
+class UPanItemFragment_Equipable_Armor;
 
 // 캐릭터 겉치장 관리 컴포넌트
 UCLASS(BlueprintType, Blueprintable)
@@ -21,7 +21,7 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	
 public:
-	void RefreshArmorMesh(EArmorType ArmorType /*, const UPanItemFragment_Equipable_Armor* ArmorFragment*/);
+	void RefreshArmorMesh(EArmorType ArmorType , const UPanItemFragment_Equipable_Armor* ArmorFragment);
 	void GetMeshComponents(TArray<UMeshComponent*>& OutMeshComponents) const;
 
 private:

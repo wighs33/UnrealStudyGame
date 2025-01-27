@@ -4,7 +4,7 @@
 #include "Actors/PanArmorBase.h"
 #include "Character/LyraCharacter.h"
 #include "Data/PanCharacterData.h"
-//#include "Item/Fragments/PanItemFragment_Equipable_Armor.h"
+#include "Item/Fragments/PanItemFragment_Equipable_Armor.h"
 #include "System/LyraAssetManager.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(PanCosmeticManagerComponent)
@@ -48,7 +48,7 @@ void UPanCosmeticManagerComponent::EndPlay(const EEndPlayReason::Type EndPlayRea
 }
 
 // 리프레시
-void UPanCosmeticManagerComponent::RefreshArmorMesh(EArmorType ArmorType /*, const UPanItemFragment_Equipable_Armor* ArmorFragment*/)
+void UPanCosmeticManagerComponent::RefreshArmorMesh(EArmorType ArmorType, const UPanItemFragment_Equipable_Armor* ArmorFragment)
 {
 	if (ArmorType == EArmorType::Count)
 		return;
@@ -56,7 +56,7 @@ void UPanCosmeticManagerComponent::RefreshArmorMesh(EArmorType ArmorType /*, con
 	// 매니저 초기화
 	InitializeManager();
 	
-	/*if (ArmorFragment)
+	if (ArmorFragment)
 	{
 		if (ArmorFragment == nullptr || ArmorFragment->ArmorType != ArmorType)
 			return;
@@ -84,7 +84,7 @@ void UPanCosmeticManagerComponent::RefreshArmorMesh(EArmorType ArmorType /*, con
 			}
 		}
 	}
-	else*/
+	else
 	{
 		// 가슴 부위일 때 [보조 메시 사용 가능성] 초기화
 		if (ArmorType == EArmorType::Chest)

@@ -1,29 +1,29 @@
-﻿#include "D1EquipManagerComponent.h"
+﻿#include "PanEquipManagerComponent.h"
 
 #include "AbilitySystemGlobals.h"
-#include "D1CosmeticManagerComponent.h"
-#include "D1EquipmentManagerComponent.h"
+#include "PanCosmeticManagerComponent.h"
+#include "PanEquipmentManagerComponent.h"
 #include "LyraGameplayTags.h"
 #include "Engine/ActorChannel.h"
-#include "Item/D1ItemInstance.h"
-#include "Item/Fragments/D1ItemFragment_Equipable.h"
-#include "Item/Fragments/D1ItemFragment_Equipable_Armor.h"
-#include "Item/Fragments/D1ItemFragment_Equipable_Weapon.h"
+#include "Item/PanItemInstance.h"
+#include "Item/Fragments/PanItemFragment_Equipable.h"
+#include "Item/Fragments/PanItemFragment_Equipable_Armor.h"
+#include "Item/Fragments/PanItemFragment_Equipable_Weapon.h"
 #include "Net/UnrealNetwork.h"
-#include "Actors/D1EquipmentBase.h"
+#include "Actors/PanEquipmentBase.h"
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
-//#include "AbilitySystem/Attributes/D1CombatSet.h"
+//#include "AbilitySystem/Attributes/PanCombatSet.h"
 #include "Character/LyraCharacter.h"
 #include "Player/LyraPlayerController.h"
-//#include "PocketWorld/D1PocketStage.h"
-//#include "PocketWorld/D1PocketWorldSubsystem.h"
-#include "System/D1GameplayTagStack.h"
+//#include "PocketWorld/PanPocketStage.h"
+//#include "PocketWorld/PanPocketWorldSubsystem.h"
+#include "System/PanGameplayTagStack.h"
 #include "System/LyraAssetManager.h"
 #include "System/LyraGameData.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(D1EquipManagerComponent)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(PanEquipManagerComponent)
 
-void FD1EquipEntry::Init(UD1ItemInstance* InItemInstance)
+void FPanEquipEntry::Init(UPanItemInstance* InItemInstance)
 {
 	if (ItemInstance == InItemInstance)
 		return;
@@ -32,7 +32,7 @@ void FD1EquipEntry::Init(UD1ItemInstance* InItemInstance)
 	ItemInstance ? Equip() : Unequip();
 }
 
-void FD1EquipEntry::Equip()
+void FPanEquipEntry::Equip()
 {
 	if (ItemInstance == nullptr)
 		return;
@@ -41,7 +41,7 @@ void FD1EquipEntry::Equip()
 	if (Character == nullptr)
 		return;
 
-	const UD1ItemFragment_Equipable* EquippableFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equipable>();
+	const UPanItemFragment_Equipable* EquippableFragment = ItemInstance->FindFragmentByClass<UPanItemFragment_Equipable>();
 	if (EquippableFragment == nullptr)
 		return;
 
@@ -76,7 +76,7 @@ void FD1EquipEntry::Equip()
 				SpecData->SetSetByCallerMagnitude(ModifierInfo.ModifierMagnitude.GetSetByCallerFloat().DataTag, 0);
 			}
 			
-			for (const FD1GameplayTagStack& Stack : ItemInstance->GetStatContainer().GetStacks())
+			for (const FPanGameplayTagStack& Stack : ItemInstance->GetStatContainer().GetStacks())
 			{
 				SpecData->SetSetByCallerMagnitude(Stack.GetStackTag(), Stack.GetStackCount());
 			}
@@ -94,12 +94,12 @@ void FD1EquipEntry::Equip()
 			}
 
 			// Spawn Current Real Weapon
-			const UD1ItemFragment_Equipable_Attachment* AttachmentFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equipable_Attachment>();
-			const FD1WeaponAttachInfo& AttachInfo = AttachmentFragment->WeaponAttachInfo;
+			const UPanItemFragment_Equipable_Attachment* AttachmentFragment = ItemInstance->FindFragmentByClass<UPanItemFragment_Equipable_Attachment>();
+			const FPanWeaponAttachInfo& AttachInfo = AttachmentFragment->WeaponAttachInfo;
 			if (AttachInfo.SpawnWeaponClass)
 			{
 				UWorld* World = EquipManager->GetWorld();
-				AD1EquipmentBase* NewWeaponActor = World->SpawnActorDeferred<AD1EquipmentBase>(AttachInfo.SpawnWeaponClass, FTransform::Identity, Character);
+				APanEquipmentBase* NewWeaponActor = World->SpawnActorDeferred<APanEquipmentBase>(AttachInfo.SpawnWeaponClass, FTransform::Identity, Character);
 				NewWeaponActor->Init(ItemInstance->GetItemTemplateID(), EquipmentSlotType);
 				NewWeaponActor->SetActorRelativeTransform(AttachInfo.AttachTransform);
 				NewWeaponActor->AttachToComponent(Character->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, AttachInfo.AttachSocket);
@@ -122,21 +122,21 @@ void FD1EquipEntry::Equip()
 
 				/* TEMP Rookiss
 				// Spawn Current Pocket Weapon				
-				const UD1ItemFragment_Equipable_Attachment* AttachmentFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equipable_Attachment>();
-				if (UD1PocketWorldSubsystem* PocketWorldSubsystem = EquipManager->GetWorld()->GetSubsystem<UD1PocketWorldSubsystem>())
+				const UPanItemFragment_Equipable_Attachment* AttachmentFragment = ItemInstance->FindFragmentByClass<UPanItemFragment_Equipable_Attachment>();
+				if (UPanPocketWorldSubsystem* PocketWorldSubsystem = EquipManager->GetWorld()->GetSubsystem<UPanPocketWorldSubsystem>())
 				{
 					if (APlayerController* PC = Character->GetLyraPlayerController())
 					{
 						PocketWorldSubsystem->RegisterAndCallForGetPocketStage(PC->GetLocalPlayer(),
-							FGetPocketStageDelegate::CreateLambda([this, AttachmentFragment](AD1PocketStage* PocketStage)
+							FGetPocketStageDelegate::CreateLambda([this, AttachmentFragment](APanPocketStage* PocketStage)
 							{
 								if (IsValid(PocketStage))
 								{
 									ACharacter* Character = PocketStage->GetCharacter();
-									const FD1WeaponAttachInfo& AttachInfo = AttachmentFragment->WeaponAttachInfo;
+									const FPanWeaponAttachInfo& AttachInfo = AttachmentFragment->WeaponAttachInfo;
 									
 									UWorld* World = EquipManager->GetWorld();
-									SpawnedPocketWorldActor = World->SpawnActorDeferred<AD1EquipmentBase>(AttachInfo.SpawnWeaponClass, FTransform::Identity, Character);
+									SpawnedPocketWorldActor = World->SpawnActorDeferred<APanEquipmentBase>(AttachInfo.SpawnWeaponClass, FTransform::Identity, Character);
 									SpawnedPocketWorldActor->SetActorRelativeTransform(AttachInfo.AttachTransform);
 									SpawnedPocketWorldActor->AttachToComponent(Character->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, AttachInfo.AttachSocket);
 									SpawnedPocketWorldActor->bOnlyUseForLocal = true;
@@ -156,8 +156,8 @@ void FD1EquipEntry::Equip()
 		else if (EquippableFragment->EquipmentType == EEquipmentType::Armor)
 		{
 			// Refresh Real Armor Mesh
-			const UD1ItemFragment_Equipable_Armor* ArmorFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equipable_Armor>();
-			if (UD1CosmeticManagerComponent* CharacterCosmetics = Character->FindComponentByClass<UD1CosmeticManagerComponent>())
+			const UPanItemFragment_Equipable_Armor* ArmorFragment = ItemInstance->FindFragmentByClass<UPanItemFragment_Equipable_Armor>();
+			if (UPanCosmeticManagerComponent* CharacterCosmetics = Character->FindComponentByClass<UPanCosmeticManagerComponent>())
 			{
 				CharacterCosmetics->RefreshArmorMesh(ArmorFragment->ArmorType, ArmorFragment);
 			}
@@ -166,16 +166,16 @@ void FD1EquipEntry::Equip()
 			if (Character->IsLocallyControlled())
 			{
 				/* TEMP Rookiss				
-				if (UD1PocketWorldSubsystem* PocketWorldSubsystem = EquipManager->GetWorld()->GetSubsystem<UD1PocketWorldSubsystem>())
+				if (UPanPocketWorldSubsystem* PocketWorldSubsystem = EquipManager->GetWorld()->GetSubsystem<UPanPocketWorldSubsystem>())
 				{
 					if (APlayerController* PC = Character->GetLyraPlayerController())
 					{
 						PocketWorldSubsystem->RegisterAndCallForGetPocketStage(PC->GetLocalPlayer(),
-							FGetPocketStageDelegate::CreateLambda([ArmorFragment](AD1PocketStage* PocketStage)
+							FGetPocketStageDelegate::CreateLambda([ArmorFragment](APanPocketStage* PocketStage)
 							{
 								if (IsValid(PocketStage))
 								{
-									if (UD1CosmeticManagerComponent* CosmeticManager = PocketStage->GetCosmeticManager())
+									if (UPanCosmeticManagerComponent* CosmeticManager = PocketStage->GetCosmeticManager())
 									{
 										CosmeticManager->RefreshArmorMesh(ArmorFragment->ArmorType, ArmorFragment);
 									}
@@ -190,7 +190,7 @@ void FD1EquipEntry::Equip()
 
 	if (EquippableFragment->EquipmentType == EEquipmentType::Weapon || EquippableFragment->EquipmentType == EEquipmentType::Utility)
 	{
-		const UD1ItemFragment_Equipable_Attachment* AttachmentFragment = ItemInstance->FindFragmentByClass<UD1ItemFragment_Equipable_Attachment>();
+		const UPanItemFragment_Equipable_Attachment* AttachmentFragment = ItemInstance->FindFragmentByClass<UPanItemFragment_Equipable_Attachment>();
 		if (USkeletalMeshComponent* MeshComponent = Character->GetMesh())
 		{
 			if (AttachmentFragment->AnimInstanceClass)
@@ -214,7 +214,7 @@ void FD1EquipEntry::Equip()
 	}
 }
 
-void FD1EquipEntry::Unequip()
+void FPanEquipEntry::Unequip()
 {
 	if (EquipManager->GetOwner()->HasAuthority())
 	{
@@ -229,7 +229,7 @@ void FD1EquipEntry::Unequip()
 		}
 		
 		// Despawn Real Weapon
-		if (UD1EquipmentManagerComponent::IsWeaponSlot(EquipmentSlotType) || UD1EquipmentManagerComponent::IsUtilitySlot(EquipmentSlotType))
+		if (UPanEquipmentManagerComponent::IsWeaponSlot(EquipmentSlotType) || UPanEquipmentManagerComponent::IsUtilitySlot(EquipmentSlotType))
 		{
 			if (IsValid(SpawnedEquipmentActor))
 			{
@@ -241,19 +241,19 @@ void FD1EquipEntry::Unequip()
 	{
 		if (ALyraCharacter* Character = EquipManager->GetCharacter())
 		{
-			if (UD1EquipmentManagerComponent::IsWeaponSlot(EquipmentSlotType) || UD1EquipmentManagerComponent::IsUtilitySlot(EquipmentSlotType))
+			if (UPanEquipmentManagerComponent::IsWeaponSlot(EquipmentSlotType) || UPanEquipmentManagerComponent::IsUtilitySlot(EquipmentSlotType))
 			{
 				// Despawn Pocket Weapon
 				if (Character->IsLocallyControlled())
 				{
 					/* TEMP Rookiss
 					
-					if (UD1PocketWorldSubsystem* PocketWorldSubsystem = EquipManager->GetWorld()->GetSubsystem<UD1PocketWorldSubsystem>())
+					if (UPanPocketWorldSubsystem* PocketWorldSubsystem = EquipManager->GetWorld()->GetSubsystem<UPanPocketWorldSubsystem>())
 					{
 						if (APlayerController* PC = Character->GetLyraPlayerController())
 						{
 							PocketWorldSubsystem->RegisterAndCallForGetPocketStage(PC->GetLocalPlayer(),
-								FGetPocketStageDelegate::CreateLambda([this](AD1PocketStage* PocketStage)
+								FGetPocketStageDelegate::CreateLambda([this](APanPocketStage* PocketStage)
 								{
 									if (IsValid(PocketStage))
 									{
@@ -268,12 +268,12 @@ void FD1EquipEntry::Unequip()
 					}*/
 				}
 			}
-			else if (UD1EquipmentManagerComponent::IsArmorSlot(EquipmentSlotType))
+			else if (UPanEquipmentManagerComponent::IsArmorSlot(EquipmentSlotType))
 			{
 				// Refresh Real Armor Mesh
 				EArmorType ArmorType = EquipManager->ConvertToArmorType(EquipmentSlotType);
 		
-				if (UD1CosmeticManagerComponent* CharacterCosmetics = Character->FindComponentByClass<UD1CosmeticManagerComponent>())
+				if (UPanCosmeticManagerComponent* CharacterCosmetics = Character->FindComponentByClass<UPanCosmeticManagerComponent>())
 				{
 					CharacterCosmetics->RefreshArmorMesh(ArmorType, nullptr);
 				}
@@ -283,16 +283,16 @@ void FD1EquipEntry::Unequip()
 				{
 					/* TEMP Rookiss
 					
-					if (UD1PocketWorldSubsystem* PocketWorldSubsystem = EquipManager->GetWorld()->GetSubsystem<UD1PocketWorldSubsystem>())
+					if (UPanPocketWorldSubsystem* PocketWorldSubsystem = EquipManager->GetWorld()->GetSubsystem<UPanPocketWorldSubsystem>())
 					{
 						if (APlayerController* PC = Character->GetLyraPlayerController())
 						{
 							PocketWorldSubsystem->RegisterAndCallForGetPocketStage(PC->GetLocalPlayer(),
-								FGetPocketStageDelegate::CreateLambda([ArmorType](AD1PocketStage* PocketStage)
+								FGetPocketStageDelegate::CreateLambda([ArmorType](APanPocketStage* PocketStage)
 								{
 									if (IsValid(PocketStage))
 									{
-										if (UD1CosmeticManagerComponent* CosmeticManager = PocketStage->GetCosmeticManager())
+										if (UPanCosmeticManagerComponent* CosmeticManager = PocketStage->GetCosmeticManager())
 										{
 											CosmeticManager->RefreshArmorMesh(ArmorType, nullptr);
 										}
@@ -307,16 +307,16 @@ void FD1EquipEntry::Unequip()
 	}
 }
 
-bool FD1EquipList::NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams)
+bool FPanEquipList::NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams)
 {
-	return FFastArraySerializer::FastArrayDeltaSerialize<FD1EquipEntry, FD1EquipList>(Entries, DeltaParams,*this);
+	return FFastArraySerializer::FastArrayDeltaSerialize<FPanEquipEntry, FPanEquipList>(Entries, DeltaParams,*this);
 }
 
-void FD1EquipList::PostReplicatedAdd(const TArrayView<int32> AddedIndices, int32 FinalSize)
+void FPanEquipList::PostReplicatedAdd(const TArrayView<int32> AddedIndices, int32 FinalSize)
 {
 	for (int32 AddedIndex : AddedIndices)
 	{
-		FD1EquipEntry& Entry = Entries[AddedIndex];
+		FPanEquipEntry& Entry = Entries[AddedIndex];
 		Entry.EquipManager = EquipManager;
 		Entry.EquipmentSlotType = (EEquipmentSlotType)AddedIndex;
 		
@@ -327,30 +327,30 @@ void FD1EquipList::PostReplicatedAdd(const TArrayView<int32> AddedIndices, int32
 	}
 }
 
-void FD1EquipList::PostReplicatedChange(const TArrayView<int32> ChangedIndices, int32 FinalSize)
+void FPanEquipList::PostReplicatedChange(const TArrayView<int32> ChangedIndices, int32 FinalSize)
 {
 	for (int32 ChangedIndex : ChangedIndices)
 	{
-		FD1EquipEntry& Entry = Entries[ChangedIndex];
+		FPanEquipEntry& Entry = Entries[ChangedIndex];
 		Entry.GetItemInstance() ? Entry.Equip() : Entry.Unequip();
 	}
 }
 
-void FD1EquipList::Equip(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance)
+void FPanEquipList::Equip(EEquipmentSlotType EquipmentSlotType, UPanItemInstance* ItemInstance)
 {
-	FD1EquipEntry& Entry = Entries[(int32)(EquipmentSlotType)];
+	FPanEquipEntry& Entry = Entries[(int32)(EquipmentSlotType)];
 	Entry.Init(ItemInstance);
 	MarkItemDirty(Entry);
 }
 
-void FD1EquipList::Unequip(EEquipmentSlotType EquipmentSlotType)
+void FPanEquipList::Unequip(EEquipmentSlotType EquipmentSlotType)
 {
-	FD1EquipEntry& Entry = Entries[(int32)(EquipmentSlotType)];
+	FPanEquipEntry& Entry = Entries[(int32)(EquipmentSlotType)];
 	Entry.Init(nullptr);
 	MarkItemDirty(Entry);
 }
 
-UD1EquipManagerComponent::UD1EquipManagerComponent(const FObjectInitializer& ObjectInitializer)
+UPanEquipManagerComponent::UPanEquipManagerComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 	, EquipList(this)
 {
@@ -358,18 +358,18 @@ UD1EquipManagerComponent::UD1EquipManagerComponent(const FObjectInitializer& Obj
 	bWantsInitializeComponent = true;
 }
 
-void UD1EquipManagerComponent::InitializeComponent()
+void UPanEquipManagerComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
 
 	if (GetOwner() && GetOwner()->HasAuthority())
 	{
-		TArray<FD1EquipEntry>& Entries = EquipList.Entries;
+		TArray<FPanEquipEntry>& Entries = EquipList.Entries;
 		Entries.SetNum((int32)EEquipmentSlotType::Count);
 
 		for (int32 i = 0; i < Entries.Num(); i++)
 		{
-			FD1EquipEntry& Entry = Entries[i];
+			FPanEquipEntry& Entry = Entries[i];
 			Entry.EquipManager = this;
 			Entry.EquipmentSlotType = (EEquipmentSlotType)i;
 			EquipList.MarkItemDirty(Entry);
@@ -377,7 +377,7 @@ void UD1EquipManagerComponent::InitializeComponent()
 	}
 }
 
-void UD1EquipManagerComponent::UninitializeComponent()
+void UPanEquipManagerComponent::UninitializeComponent()
 {
 	if (GetOwner() && GetOwner()->HasAuthority())
 	{
@@ -390,7 +390,7 @@ void UD1EquipManagerComponent::UninitializeComponent()
 	Super::UninitializeComponent();
 }
 
-void UD1EquipManagerComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void UPanEquipManagerComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
@@ -399,13 +399,13 @@ void UD1EquipManagerComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 	DOREPLIFETIME(ThisClass, bShouldHiddenEquipments);
 }
 
-bool UD1EquipManagerComponent::ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags)
+bool UPanEquipManagerComponent::ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags)
 {
 	bool bWroteSomething = Super::ReplicateSubobjects(Channel, Bunch, RepFlags);
 	
-	for (FD1EquipEntry& Entry : EquipList.Entries)
+	for (FPanEquipEntry& Entry : EquipList.Entries)
 	{
-		UD1ItemInstance* ItemInstance = Entry.GetItemInstance();
+		UPanItemInstance* ItemInstance = Entry.GetItemInstance();
 		if (IsValid(ItemInstance))
 		{
 			bWroteSomething |= Channel->ReplicateSubobject(ItemInstance, *Bunch, *RepFlags);
@@ -415,15 +415,15 @@ bool UD1EquipManagerComponent::ReplicateSubobjects(UActorChannel* Channel, FOutB
 	return bWroteSomething;
 }
 
-void UD1EquipManagerComponent::ReadyForReplication()
+void UPanEquipManagerComponent::ReadyForReplication()
 {
 	Super::ReadyForReplication();
 
 	if (IsUsingRegisteredSubObjectList())
 	{
-		for (const FD1EquipEntry& Entry : EquipList.Entries)
+		for (const FPanEquipEntry& Entry : EquipList.Entries)
 		{
-			UD1ItemInstance* ItemInstance = Entry.GetItemInstance();
+			UPanItemInstance* ItemInstance = Entry.GetItemInstance();
 			if (IsValid(ItemInstance))
 			{
 				AddReplicatedSubObject(ItemInstance);
@@ -432,7 +432,7 @@ void UD1EquipManagerComponent::ReadyForReplication()
 	}
 }
 
-void UD1EquipManagerComponent::Equip(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance)
+void UPanEquipManagerComponent::Equip(EEquipmentSlotType EquipmentSlotType, UPanItemInstance* ItemInstance)
 {
 	check(GetOwner()->HasAuthority());
 
@@ -446,16 +446,16 @@ void UD1EquipManagerComponent::Equip(EEquipmentSlotType EquipmentSlotType, UD1It
 	}
 }
 
-void UD1EquipManagerComponent::Unequip(EEquipmentSlotType EquipmentSlotType)
+void UPanEquipManagerComponent::Unequip(EEquipmentSlotType EquipmentSlotType)
 {
 	check(GetOwner()->HasAuthority())
 
 	if (EquipmentSlotType == EEquipmentSlotType::Count)
 		return;
 	
-	TArray<FD1EquipEntry>& Entries = EquipList.Entries;
-	FD1EquipEntry& Entry = Entries[(int32)EquipmentSlotType];
-	UD1ItemInstance* RemovedItemInstance = Entry.GetItemInstance();
+	TArray<FPanEquipEntry>& Entries = EquipList.Entries;
+	FPanEquipEntry& Entry = Entries[(int32)EquipmentSlotType];
+	UPanItemInstance* RemovedItemInstance = Entry.GetItemInstance();
 	
 	EquipList.Unequip(EquipmentSlotType);
 	if (IsUsingRegisteredSubObjectList() && RemovedItemInstance)
@@ -464,36 +464,36 @@ void UD1EquipManagerComponent::Unequip(EEquipmentSlotType EquipmentSlotType)
 	}
 }
 
-void UD1EquipManagerComponent::EquipCurrentSlots()
+void UPanEquipManagerComponent::EquipCurrentSlots()
 {
 	check(GetOwner()->HasAuthority());
 
 	if (CurrentEquipState == EEquipState::Count)
 		return;
 	
-	if (UD1EquipmentManagerComponent* EquipmentManager = GetEquipmentManager())
+	if (UPanEquipmentManagerComponent* EquipmentManager = GetEquipmentManager())
 	{
-		for (EEquipmentSlotType EquipmentSlotType : UD1EquipManagerComponent::GetEquipmentSlotsByEquipState(CurrentEquipState))
+		for (EEquipmentSlotType EquipmentSlotType : UPanEquipManagerComponent::GetEquipmentSlotsByEquipState(CurrentEquipState))
 		{
 			Equip(EquipmentSlotType, EquipmentManager->GetItemInstance(EquipmentSlotType));
 		}
 	}
 }
 
-void UD1EquipManagerComponent::UnequipCurrentSlots()
+void UPanEquipManagerComponent::UnequipCurrentSlots()
 {
 	check(GetOwner()->HasAuthority());
 
 	if (CurrentEquipState == EEquipState::Count)
 		return;
 	
-	for (EEquipmentSlotType EquipmentSlotType : UD1EquipManagerComponent::GetEquipmentSlotsByEquipState(CurrentEquipState))
+	for (EEquipmentSlotType EquipmentSlotType : UPanEquipManagerComponent::GetEquipmentSlotsByEquipState(CurrentEquipState))
 	{
 		Unequip(EquipmentSlotType);
 	}
 }
 
-void UD1EquipManagerComponent::ChangeEquipState(EEquipState NewEquipState)
+void UPanEquipManagerComponent::ChangeEquipState(EEquipState NewEquipState)
 {
 	check(GetOwner()->HasAuthority());
 
@@ -510,7 +510,7 @@ void UD1EquipManagerComponent::ChangeEquipState(EEquipState NewEquipState)
 	}
 }
 
-bool UD1EquipManagerComponent::CanChangeEquipState(EEquipState NewEquipState) const
+bool UPanEquipManagerComponent::CanChangeEquipState(EEquipState NewEquipState) const
 {
 	if (NewEquipState == EEquipState::Count)
 		return false;
@@ -521,17 +521,17 @@ bool UD1EquipManagerComponent::CanChangeEquipState(EEquipState NewEquipState) co
 	if (CurrentEquipState == NewEquipState)
 		return true;
 	
-	UD1EquipmentManagerComponent* EquipmentManager = GetEquipmentManager();
+	UPanEquipmentManagerComponent* EquipmentManager = GetEquipmentManager();
 	if (EquipmentManager == nullptr)
 		return false;
 	
 	return (EquipmentManager->IsAllEmpty(NewEquipState) == false);
 }
 
-AD1EquipmentBase* UD1EquipManagerComponent::GetFirstEquippedActor() const
+APanEquipmentBase* UPanEquipManagerComponent::GetFirstEquippedActor() const
 {
-	AD1EquipmentBase* EquipmentActor = nullptr;
-	const TArray<FD1EquipEntry>& Entries = EquipList.Entries;
+	APanEquipmentBase* EquipmentActor = nullptr;
+	const TArray<FPanEquipEntry>& Entries = EquipList.Entries;
 
 	if (IsWeaponEquipState(CurrentEquipState))
 	{
@@ -558,21 +558,21 @@ AD1EquipmentBase* UD1EquipManagerComponent::GetFirstEquippedActor() const
 	return EquipmentActor;
 }
 
-AD1EquipmentBase* UD1EquipManagerComponent::GetEquippedActor(EWeaponHandType WeaponHandType) const
+APanEquipmentBase* UPanEquipManagerComponent::GetEquippedActor(EWeaponHandType WeaponHandType) const
 {
 	if (WeaponHandType == EWeaponHandType::Count)
 		return GetFirstEquippedActor();
 	
-	const TArray<FD1EquipEntry>& Entries = EquipList.Entries;
+	const TArray<FPanEquipEntry>& Entries = EquipList.Entries;
 	const int32 EntryIndex = (int32)ConvertToEquipmentSlotType(WeaponHandType, CurrentEquipState);
 	return Entries.IsValidIndex(EntryIndex) ? Entries[EntryIndex].GetEquipmentActor() : nullptr;
 }
 
-void UD1EquipManagerComponent::GetAllEquippedActors(TArray<AD1EquipmentBase*>& OutActors) const
+void UPanEquipManagerComponent::GetAllEquippedActors(TArray<APanEquipmentBase*>& OutActors) const
 {
 	OutActors.Reset();
 	
-	const TArray<FD1EquipEntry>& Entries = EquipList.Entries;
+	const TArray<FPanEquipEntry>& Entries = EquipList.Entries;
 	
 	if (IsWeaponEquipState(CurrentEquipState))
 	{
@@ -595,9 +595,9 @@ void UD1EquipManagerComponent::GetAllEquippedActors(TArray<AD1EquipmentBase*>& O
 	}
 }
 
-UD1ItemInstance* UD1EquipManagerComponent::GetFirstEquippedItemInstance(bool bIgnoreArmor) const
+UPanItemInstance* UPanEquipManagerComponent::GetFirstEquippedItemInstance(bool bIgnoreArmor) const
 {
-	const TArray<FD1EquipEntry>& Entries = EquipList.Entries;
+	const TArray<FPanEquipEntry>& Entries = EquipList.Entries;
 
 	if (bIgnoreArmor == false)
 	{
@@ -607,12 +607,12 @@ UD1ItemInstance* UD1EquipManagerComponent::GetFirstEquippedItemInstance(bool bIg
 			if (Entries.IsValidIndex(EntryIndex) == false)
 				continue;
 
-			if (UD1ItemInstance* ItemInstance = Entries[EntryIndex].GetItemInstance())
+			if (UPanItemInstance* ItemInstance = Entries[EntryIndex].GetItemInstance())
 				return ItemInstance;
 		}
 	}
 
-	UD1ItemInstance* ItemInstance = nullptr;
+	UPanItemInstance* ItemInstance = nullptr;
 	
 	if (IsWeaponEquipState(CurrentEquipState))
 	{
@@ -639,39 +639,39 @@ UD1ItemInstance* UD1EquipManagerComponent::GetFirstEquippedItemInstance(bool bIg
 	return ItemInstance;
 }
 
-UD1ItemInstance* UD1EquipManagerComponent::GetEquippedItemInstance(EArmorType ArmorType) const
+UPanItemInstance* UPanEquipManagerComponent::GetEquippedItemInstance(EArmorType ArmorType) const
 {
-	const TArray<FD1EquipEntry>& Entries = EquipList.Entries;
+	const TArray<FPanEquipEntry>& Entries = EquipList.Entries;
 	const int32 EntryIndex = (int32)ConvertToEquipmentSlotType(ArmorType);
 	return Entries.IsValidIndex(EntryIndex) ? Entries[EntryIndex].GetItemInstance() : nullptr;
 }
 
-UD1ItemInstance* UD1EquipManagerComponent::GetEquippedItemInstance(EWeaponHandType WeaponHandType) const
+UPanItemInstance* UPanEquipManagerComponent::GetEquippedItemInstance(EWeaponHandType WeaponHandType) const
 {
 	if (WeaponHandType == EWeaponHandType::Count)
 		return GetFirstEquippedItemInstance();
 	
-	const TArray<FD1EquipEntry>& Entries = EquipList.Entries;
+	const TArray<FPanEquipEntry>& Entries = EquipList.Entries;
 	const int32 EntryIndex = (int32)ConvertToEquipmentSlotType(WeaponHandType, CurrentEquipState);
 	return Entries.IsValidIndex(EntryIndex) ? Entries[EntryIndex].GetItemInstance() : nullptr;
 }
 
-UD1ItemInstance* UD1EquipManagerComponent::GetEquippedItemInstance(EEquipmentSlotType EquipmentSlotType) const
+UPanItemInstance* UPanEquipManagerComponent::GetEquippedItemInstance(EEquipmentSlotType EquipmentSlotType) const
 {
 	if (EquipmentSlotType == EEquipmentSlotType::Count)
 		return nullptr;
 
-	const TArray<FD1EquipEntry>& Entries = EquipList.Entries;
+	const TArray<FPanEquipEntry>& Entries = EquipList.Entries;
 	const int32 EntryIndex = (int32)EquipmentSlotType;
 	return Entries.IsValidIndex(EntryIndex) ? Entries[EntryIndex].GetItemInstance() : nullptr;
 }
 
-void UD1EquipManagerComponent::OnRep_CurrentEquipState(EEquipState PrevEquipState)
+void UPanEquipManagerComponent::OnRep_CurrentEquipState(EEquipState PrevEquipState)
 {
 	BroadcastChangedMessage(PrevEquipState, CurrentEquipState);
 }
 
-void UD1EquipManagerComponent::BroadcastChangedMessage(EEquipState PrevEquipState, EEquipState NewEquipState)
+void UPanEquipManagerComponent::BroadcastChangedMessage(EEquipState PrevEquipState, EEquipState NewEquipState)
 {
 	if (OnEquipStateChanged.IsBound())
 	{
@@ -679,12 +679,12 @@ void UD1EquipManagerComponent::BroadcastChangedMessage(EEquipState PrevEquipStat
 	}
 }
 
-ALyraCharacter* UD1EquipManagerComponent::GetCharacter() const
+ALyraCharacter* UPanEquipManagerComponent::GetCharacter() const
 {
 	return Cast<ALyraCharacter>(GetOwner());
 }
 
-ALyraPlayerController* UD1EquipManagerComponent::GetPlayerController() const
+ALyraPlayerController* UPanEquipManagerComponent::GetPlayerController() const
 {
 	if (ALyraCharacter* LyraCharacter = GetCharacter())
 	{
@@ -693,26 +693,26 @@ ALyraPlayerController* UD1EquipManagerComponent::GetPlayerController() const
 	return nullptr;
 }
 
-TArray<FD1EquipEntry>& UD1EquipManagerComponent::GetAllEntries()
+TArray<FPanEquipEntry>& UPanEquipManagerComponent::GetAllEntries()
 {
 	return EquipList.GetAllEntries();
 }
 
-UAbilitySystemComponent* UD1EquipManagerComponent::GetAbilitySystemComponent() const
+UAbilitySystemComponent* UPanEquipManagerComponent::GetAbilitySystemComponent() const
 {
 	return UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetOwner());
 }
 
-UD1EquipmentManagerComponent* UD1EquipManagerComponent::GetEquipmentManager() const
+UPanEquipmentManagerComponent* UPanEquipManagerComponent::GetEquipmentManager() const
 {
 	if (ALyraCharacter* LyraCharacter = GetCharacter())
 	{
-		return LyraCharacter->FindComponentByClass<UD1EquipmentManagerComponent>();
+		return LyraCharacter->FindComponentByClass<UPanEquipmentManagerComponent>();
 	}
 	return nullptr;
 }
 
-EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponHandType WeaponHandType, EEquipState EquipState)
+EEquipmentSlotType UPanEquipManagerComponent::ConvertToEquipmentSlotType(EWeaponHandType WeaponHandType, EEquipState EquipState)
 {
 	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;
 
@@ -762,7 +762,7 @@ EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponH
 	return EquipmentSlotType;
 }
 
-EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponHandType WeaponHandType, EWeaponSlotType WeaponSlotType)
+EEquipmentSlotType UPanEquipManagerComponent::ConvertToEquipmentSlotType(EWeaponHandType WeaponHandType, EWeaponSlotType WeaponSlotType)
 {
 	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;
 
@@ -788,7 +788,7 @@ EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EWeaponH
 	return EquipmentSlotType;
 }
 
-EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EArmorType ArmorType)
+EEquipmentSlotType UPanEquipManagerComponent::ConvertToEquipmentSlotType(EArmorType ArmorType)
 {
 	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;
 
@@ -804,7 +804,7 @@ EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EArmorTy
 	return EquipmentSlotType;
 }
 
-EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EUtilitySlotType UtilitySlotType)
+EEquipmentSlotType UPanEquipManagerComponent::ConvertToEquipmentSlotType(EUtilitySlotType UtilitySlotType)
 {
 	EEquipmentSlotType EquipmentSlotType = EEquipmentSlotType::Count;
 
@@ -819,7 +819,7 @@ EEquipmentSlotType UD1EquipManagerComponent::ConvertToEquipmentSlotType(EUtility
 	return EquipmentSlotType;
 }
 
-EWeaponHandType UD1EquipManagerComponent::ConvertToWeaponHandType(EEquipmentSlotType EquipmentSlotType)
+EWeaponHandType UPanEquipManagerComponent::ConvertToWeaponHandType(EEquipmentSlotType EquipmentSlotType)
 {
 	EWeaponHandType WeaponHandType = EWeaponHandType::Count;
 	
@@ -844,7 +844,7 @@ EWeaponHandType UD1EquipManagerComponent::ConvertToWeaponHandType(EEquipmentSlot
 	return WeaponHandType;
 }
 
-EArmorType UD1EquipManagerComponent::ConvertToArmorType(EEquipmentSlotType EquipmentSlotType)
+EArmorType UPanEquipManagerComponent::ConvertToArmorType(EEquipmentSlotType EquipmentSlotType)
 {
 	EArmorType ArmorType = EArmorType::Count;
 	
@@ -860,7 +860,7 @@ EArmorType UD1EquipManagerComponent::ConvertToArmorType(EEquipmentSlotType Equip
 	return ArmorType;
 }
 
-EUtilitySlotType UD1EquipManagerComponent::ConvertToUtilitySlotType(EEquipmentSlotType EquipmentSlotType)
+EUtilitySlotType UPanEquipManagerComponent::ConvertToUtilitySlotType(EEquipmentSlotType EquipmentSlotType)
 {
 	EUtilitySlotType UtilitySlotType = EUtilitySlotType::Count;
 
@@ -875,7 +875,7 @@ EUtilitySlotType UD1EquipManagerComponent::ConvertToUtilitySlotType(EEquipmentSl
 	return UtilitySlotType;
 }
 
-EEquipState UD1EquipManagerComponent::ConvertToEquipState(EWeaponSlotType WeaponSlotType)
+EEquipState UPanEquipManagerComponent::ConvertToEquipState(EWeaponSlotType WeaponSlotType)
 {
 	EEquipState EquipState = EEquipState::Count;
 
@@ -888,7 +888,7 @@ EEquipState UD1EquipManagerComponent::ConvertToEquipState(EWeaponSlotType Weapon
 	return EquipState;
 }
 
-EEquipState UD1EquipManagerComponent::ConvertToEquipState(EUtilitySlotType UtilitySlotType)
+EEquipState UPanEquipManagerComponent::ConvertToEquipState(EUtilitySlotType UtilitySlotType)
 {
 	EEquipState EquipState = EEquipState::Count;
 
@@ -903,17 +903,17 @@ EEquipState UD1EquipManagerComponent::ConvertToEquipState(EUtilitySlotType Utili
 	return EquipState;
 }
 
-bool UD1EquipManagerComponent::IsWeaponEquipState(EEquipState EquipState)
+bool UPanEquipManagerComponent::IsWeaponEquipState(EEquipState EquipState)
 {
 	return (EEquipState::Unarmed <= EquipState && EquipState <= EEquipState::Weapon_Secondary);
 }
 
-bool UD1EquipManagerComponent::IsUtilityEquipState(EEquipState EquipState)
+bool UPanEquipManagerComponent::IsUtilityEquipState(EEquipState EquipState)
 {
 	return (EEquipState::Utility_Primary <= EquipState && EquipState <= EEquipState::Utility_Quaternary);
 }
 
-const TArray<EEquipmentSlotType>& UD1EquipManagerComponent::GetEquipmentSlotsByEquipState(EEquipState EquipState)
+const TArray<EEquipmentSlotType>& UPanEquipManagerComponent::GetEquipmentSlotsByEquipState(EEquipState EquipState)
 {
 	static const TArray<TArray<EEquipmentSlotType>> EquipmentSlotsByEquipState = {
 		{ EEquipmentSlotType::Unarmed_LeftHand,    EEquipmentSlotType::Unarmed_RightHand                                            },
@@ -933,7 +933,7 @@ const TArray<EEquipmentSlotType>& UD1EquipManagerComponent::GetEquipmentSlotsByE
 	}
 }
 
-EWeaponSlotType UD1EquipManagerComponent::ConvertToWeaponSlotType(EEquipmentSlotType EquipmentSlotType)
+EWeaponSlotType UPanEquipManagerComponent::ConvertToWeaponSlotType(EEquipmentSlotType EquipmentSlotType)
 {
 	EWeaponSlotType WeaponSlotType = EWeaponSlotType::Count;
 
@@ -954,14 +954,14 @@ EWeaponSlotType UD1EquipManagerComponent::ConvertToWeaponSlotType(EEquipmentSlot
 	return WeaponSlotType;
 }
 
-void UD1EquipManagerComponent::ChangeShouldHiddenEquipments(bool bNewShouldHiddenEquipments)
+void UPanEquipManagerComponent::ChangeShouldHiddenEquipments(bool bNewShouldHiddenEquipments)
 {
 	bShouldHiddenEquipments = bNewShouldHiddenEquipments;
 
-	TArray<AD1EquipmentBase*> OutEquippedActors;
+	TArray<APanEquipmentBase*> OutEquippedActors;
 	GetAllEquippedActors(OutEquippedActors);
 
-	for (AD1EquipmentBase* WeaponActor : OutEquippedActors)
+	for (APanEquipmentBase* WeaponActor : OutEquippedActors)
 	{
 		if (IsValid(WeaponActor))
 		{

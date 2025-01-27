@@ -5,12 +5,12 @@
 #include "Net/Serialization/FastArraySerializer.h"
 #include "PanEquipmentManagerComponent.generated.h"
 
-//class UPanEquipManagerComponent;
+class UPanEquipManagerComponent;
 class ALyraCharacter;
 class ALyraPlayerController;
 class UPanItemInstance;
 class UPanItemTemplate;
-//class UPanEquipmentManagerComponent;
+class UPanEquipmentManagerComponent;
 //class UPanInventoryManagerComponent;
 
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnEquipmentEntryChanged, EEquipmentSlotType, UPanItemInstance*, int32/*ItemCount*/);
@@ -156,7 +156,7 @@ public:
 
 	ALyraCharacter* GetCharacter() const;
 	ALyraPlayerController* GetPlayerController() const;
-	//UPanEquipManagerComponent* GetEquipManager() const;
+	UPanEquipManagerComponent* GetEquipManager() const;
 	
 	UPanItemInstance* GetItemInstance(EEquipmentSlotType EquipmentSlotType) const;
 	int32 GetItemCount(EEquipmentSlotType EquipmentSlotType) const;

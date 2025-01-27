@@ -1,6 +1,6 @@
 ﻿#include "PanEquipmentManagerComponent.h"
 
-//#include "PanEquipManagerComponent.h"
+#include "PanEquipManagerComponent.h"
 //#include "PanInventoryManagerComponent.h"
 //#include "PanItemManagerComponent.h"
 #include "Character/LyraCharacter.h"
@@ -20,9 +20,9 @@ void FPanEquipmentEntry::Init(UPanItemInstance* InItemInstance, int32 InItemCoun
 {
 	check(InItemInstance && InItemCount > 0);
 
-	/*UPanEquipManagerComponent* EquipManager = EquipmentManager->GetEquipManager();
+	UPanEquipManagerComponent* EquipManager = EquipmentManager->GetEquipManager();
 	if (EquipManager == nullptr)
-		return;*/
+		return;
 
 	const UPanItemFragment_Equipable* EquippableFragment = InItemInstance->FindFragmentByClass<UPanItemFragment_Equipable>();
 	if (EquippableFragment == nullptr)
@@ -30,7 +30,7 @@ void FPanEquipmentEntry::Init(UPanItemInstance* InItemInstance, int32 InItemCoun
 	
 	if (ItemInstance)
 	{
-		//EquipManager->Unequip(EquipmentSlotType);
+		EquipManager->Unequip(EquipmentSlotType);
 	}
 	
 	ItemInstance = InItemInstance;
@@ -38,31 +38,31 @@ void FPanEquipmentEntry::Init(UPanItemInstance* InItemInstance, int32 InItemCoun
 	const UPanItemTemplate& ItemTemplate = UPanItemData::Get().FindItemTemplateByID(ItemInstance->GetItemTemplateID());
 	ItemCount = FMath::Clamp(InItemCount, 1, ItemTemplate.MaxStackCount);
 	
-	//if (EquippableFragment->EquipmentType == EEquipmentType::Armor || EquipmentManager->IsSameEquipState(EquipmentSlotType, EquipManager->GetCurrentEquipState()))
+	if (EquippableFragment->EquipmentType == EEquipmentType::Armor || EquipmentManager->IsSameEquipState(EquipmentSlotType, EquipManager->GetCurrentEquipState()))
 	{
-		//EquipManager->Equip(EquipmentSlotType, ItemInstance);
+		EquipManager->Equip(EquipmentSlotType, ItemInstance);
 	}
 }
 
 // 프로퍼티에 값 비우기
 UPanItemInstance* FPanEquipmentEntry::Reset()
 {
-	/*UPanEquipManagerComponent* EquipManager = EquipmentManager->GetEquipManager();
+	UPanEquipManagerComponent* EquipManager = EquipmentManager->GetEquipManager();
 	if (EquipManager == nullptr)
-		return nullptr;*/
+		return nullptr;
 
 	if (ItemInstance)
 	{
-		//EquipManager->Unequip(EquipmentSlotType);
+		EquipManager->Unequip(EquipmentSlotType);
 	}
 	
 	UPanItemInstance* RemovedItemInstance = ItemInstance;
 	ItemInstance = nullptr;
 	ItemCount = 0;
 	
-	//if (EquipmentManager->IsAllEmpty(EquipManager->GetCurrentEquipState()))
+	if (EquipmentManager->IsAllEmpty(EquipManager->GetCurrentEquipState()))
 	{
-		//EquipManager->ChangeEquipState(EEquipState::Unarmed);
+		EquipManager->ChangeEquipState(EEquipState::Unarmed);
 	}
 	
 	return RemovedItemInstance;
@@ -368,7 +368,7 @@ void UPanEquipmentManagerComponent::SetEquipment(EEquipmentSlotType EquipmentSlo
 
 	if (IsWeaponSlot(EquipmentSlotType))
 	{
-		/*if (UPanEquipManagerComponent* EquipManager = GetEquipManager())
+		if (UPanEquipManagerComponent* EquipManager = GetEquipManager())
 		{
 			EWeaponSlotType WeaponSlotType = UPanEquipManagerComponent::ConvertToWeaponSlotType(EquipmentSlotType);
 			EEquipState EquipState = UPanEquipManagerComponent::ConvertToEquipState(WeaponSlotType);
@@ -376,7 +376,7 @@ void UPanEquipmentManagerComponent::SetEquipment(EEquipmentSlotType EquipmentSlo
 			{
 				EquipManager->ChangeEquipState(EquipState);
 			}
-		}*/
+		}
 	}
 }
 
@@ -497,9 +497,9 @@ const UPanItemInstance* UPanEquipmentManagerComponent::FindPairItemInstance(cons
 	}
 	else if (BaseEquippableFragment->EquipmentType == EEquipmentType::Armor)
 	{
-		/*const UPanItemFragment_Equipable_Armor* BaseArmorFragment = Cast<UPanItemFragment_Equipable_Armor>(BaseEquippableFragment);
+		const UPanItemFragment_Equipable_Armor* BaseArmorFragment = Cast<UPanItemFragment_Equipable_Armor>(BaseEquippableFragment);
 		OutEquipmentSlotType = UPanEquipManagerComponent::ConvertToEquipmentSlotType(BaseArmorFragment->ArmorType);
-		SelectedItemInstance = GetItemInstance(OutEquipmentSlotType);*/
+		SelectedItemInstance = GetItemInstance(OutEquipmentSlotType);
 	}
 
 	if (InBaseItemInstance == SelectedItemInstance)
@@ -519,7 +519,7 @@ bool UPanEquipmentManagerComponent::IsAllEmpty(EEquipState EquipState) const
 		return false;
 
 	bool bAllEmpty = true;
-	/*for (EEquipmentSlotType SlotType : UPanEquipManagerComponent::GetEquipmentSlotsByEquipState(EquipState))
+	for (EEquipmentSlotType SlotType : UPanEquipManagerComponent::GetEquipmentSlotsByEquipState(EquipState))
 	{
 		const FPanEquipmentEntry& Entry = EquipmentList.Entries[(int32)SlotType];
 		if (Entry.ItemInstance)
@@ -527,7 +527,7 @@ bool UPanEquipmentManagerComponent::IsAllEmpty(EEquipState EquipState) const
 			bAllEmpty = false;
 			break;
 		}
-	}*/
+	}
 	return bAllEmpty;
 }
 
@@ -543,6 +543,16 @@ ALyraPlayerController* UPanEquipmentManagerComponent::GetPlayerController() cons
 		return LyraCharacter->GetLyraPlayerController();
 	}
 	return nullptr;
+}
+
+UPanEquipManagerComponent* UPanEquipmentManagerComponent::GetEquipManager() const
+{
+	UPanEquipManagerComponent* EquipManager = nullptr;
+	if (ALyraCharacter* Character = GetCharacter())
+	{
+		EquipManager = Character->FindComponentByClass<UPanEquipManagerComponent>();
+	}
+	return EquipManager;
 }
 
 UPanItemInstance* UPanEquipmentManagerComponent::GetItemInstance(EEquipmentSlotType EquipmentSlotType) const

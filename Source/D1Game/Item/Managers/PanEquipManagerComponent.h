@@ -1,44 +1,44 @@
 ﻿#pragma once
 
-#include "D1Define.h"
+#include "PanDefine.h"
 #include "AbilitySystem/LyraAbilitySet.h"
 #include "Components/PawnComponent.h"
 #include "Net/Serialization/FastArraySerializer.h"
-#include "D1EquipManagerComponent.generated.h"
+#include "PanEquipManagerComponent.generated.h"
 
-class AD1PocketWorldAttachment;
+class APanPocketWorldAttachment;
 class ALyraCharacter;
 class ALyraPlayerController;
-class AD1EquipmentBase;
-class UD1ItemInstance;
-class UD1EquipManagerComponent;
-class UD1EquipmentManagerComponent;
+class APanEquipmentBase;
+class UPanItemInstance;
+class UPanEquipManagerComponent;
+class UPanEquipmentManagerComponent;
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnEquipStateChanged, EEquipState, EEquipState);
 
 USTRUCT(BlueprintType)
-struct FD1EquipEntry : public FFastArraySerializerItem
+struct FPanEquipEntry : public FFastArraySerializerItem
 {
 	GENERATED_BODY()
 	
 private:
-	void Init(UD1ItemInstance* InItemInstance);
+	void Init(UPanItemInstance* InItemInstance);
 	
 	void Equip();
 	void Unequip();
 
 public:
-	UD1ItemInstance* GetItemInstance() const { return ItemInstance; }
+	UPanItemInstance* GetItemInstance() const { return ItemInstance; }
 
-	void SetEquipmentActor(AD1EquipmentBase* InEquipmentActor) { SpawnedEquipmentActor = InEquipmentActor; }
-	AD1EquipmentBase* GetEquipmentActor() const { return SpawnedEquipmentActor; }
+	void SetEquipmentActor(APanEquipmentBase* InEquipmentActor) { SpawnedEquipmentActor = InEquipmentActor; }
+	APanEquipmentBase* GetEquipmentActor() const { return SpawnedEquipmentActor; }
 	
 private:
-	friend struct FD1EquipList;
-	friend class UD1EquipManagerComponent;
+	friend struct FPanEquipList;
+	friend class UPanEquipManagerComponent;
 	
 	UPROPERTY()
-	TObjectPtr<UD1ItemInstance> ItemInstance;
+	TObjectPtr<UPanItemInstance> ItemInstance;
 
 private:
 	UPROPERTY(NotReplicated)
@@ -46,10 +46,10 @@ private:
 
 private:
 	UPROPERTY(NotReplicated)
-	TObjectPtr<AD1EquipmentBase> SpawnedEquipmentActor;
+	TObjectPtr<APanEquipmentBase> SpawnedEquipmentActor;
 
 	UPROPERTY(NotReplicated)
-	TObjectPtr<AD1EquipmentBase> SpawnedPocketWorldActor;
+	TObjectPtr<APanEquipmentBase> SpawnedPocketWorldActor;
 
 private:
 	UPROPERTY(NotReplicated)
@@ -60,17 +60,17 @@ private:
 
 public:
 	UPROPERTY(NotReplicated)
-	TObjectPtr<UD1EquipManagerComponent> EquipManager;
+	TObjectPtr<UPanEquipManagerComponent> EquipManager;
 };
 
 USTRUCT(BlueprintType)
-struct FD1EquipList : public FFastArraySerializer
+struct FPanEquipList : public FFastArraySerializer
 {
 	GENERATED_BODY()
 
 public:
-	FD1EquipList() : EquipManager(nullptr) { }
-	FD1EquipList(UD1EquipManagerComponent* InOwnerComponent) : EquipManager(InOwnerComponent) { }
+	FPanEquipList() : EquipManager(nullptr) { }
+	FPanEquipList(UPanEquipManagerComponent* InOwnerComponent) : EquipManager(InOwnerComponent) { }
 
 public:
 	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams);
@@ -78,24 +78,24 @@ public:
 	void PostReplicatedChange(const TArrayView<int32> ChangedIndices, int32 FinalSize);
 
 private:
-	void Equip(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance);
+	void Equip(EEquipmentSlotType EquipmentSlotType, UPanItemInstance* ItemInstance);
 	void Unequip(EEquipmentSlotType EquipmentSlotType);
 	
 public:
-	TArray<FD1EquipEntry>& GetAllEntries() { return Entries; }
+	TArray<FPanEquipEntry>& GetAllEntries() { return Entries; }
 	
 private:
-	friend class UD1EquipManagerComponent;
+	friend class UPanEquipManagerComponent;
 
 	UPROPERTY()
-	TArray<FD1EquipEntry> Entries;
+	TArray<FPanEquipEntry> Entries;
 	
 	UPROPERTY(NotReplicated)
-	TObjectPtr<UD1EquipManagerComponent> EquipManager;
+	TObjectPtr<UPanEquipManagerComponent> EquipManager;
 };
 
 template<>
-struct TStructOpsTypeTraits<FD1EquipList> : public TStructOpsTypeTraitsBase2<FD1EquipList>
+struct TStructOpsTypeTraits<FPanEquipList> : public TStructOpsTypeTraitsBase2<FPanEquipList>
 {
 	enum
 	{
@@ -104,12 +104,12 @@ struct TStructOpsTypeTraits<FD1EquipList> : public TStructOpsTypeTraitsBase2<FD1
 };
 
 UCLASS(BlueprintType)
-class UD1EquipManagerComponent : public UPawnComponent
+class UPanEquipManagerComponent : public UPawnComponent
 {
 	GENERATED_BODY()
 	
 public:
-	UD1EquipManagerComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UPanEquipManagerComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
 	virtual void InitializeComponent() override;
@@ -120,7 +120,7 @@ protected:
 	virtual void ReadyForReplication() override;
 	
 public:
-	void Equip(EEquipmentSlotType EquipmentSlotType, UD1ItemInstance* ItemInstance);
+	void Equip(EEquipmentSlotType EquipmentSlotType, UPanItemInstance* ItemInstance);
 	void Unequip(EEquipmentSlotType EquipmentSlotType);
 
 	void EquipCurrentSlots();
@@ -143,9 +143,9 @@ public:
 	ALyraCharacter* GetCharacter() const;
 	ALyraPlayerController* GetPlayerController() const;
 	
-	TArray<FD1EquipEntry>& GetAllEntries();
+	TArray<FPanEquipEntry>& GetAllEntries();
 	UAbilitySystemComponent* GetAbilitySystemComponent() const;
-	UD1EquipmentManagerComponent* GetEquipmentManager() const;
+	UPanEquipmentManagerComponent* GetEquipmentManager() const;
 
 	static EEquipmentSlotType ConvertToEquipmentSlotType(EWeaponHandType WeaponHandType, EEquipState EquipState);
 	static EEquipmentSlotType ConvertToEquipmentSlotType(EWeaponHandType WeaponHandType, EWeaponSlotType WeaponSlotType);
@@ -170,21 +170,21 @@ public:
 	bool ShouldHiddenEquipments() const { return bShouldHiddenEquipments; }
 	EEquipState GetCurrentEquipState() const { return CurrentEquipState; }
 	
-	AD1EquipmentBase* GetFirstEquippedActor() const;
-	AD1EquipmentBase* GetEquippedActor(EWeaponHandType WeaponHandType) const;
-	void GetAllEquippedActors(TArray<AD1EquipmentBase*>& OutActors) const;
+	APanEquipmentBase* GetFirstEquippedActor() const;
+	APanEquipmentBase* GetEquippedActor(EWeaponHandType WeaponHandType) const;
+	void GetAllEquippedActors(TArray<APanEquipmentBase*>& OutActors) const;
 
-	UD1ItemInstance* GetFirstEquippedItemInstance(bool bIgnoreArmor = true) const;
-	UD1ItemInstance* GetEquippedItemInstance(EArmorType ArmorType) const;
-	UD1ItemInstance* GetEquippedItemInstance(EWeaponHandType WeaponHandType) const;
-	UD1ItemInstance* GetEquippedItemInstance(EEquipmentSlotType EquipmentSlotType) const;
+	UPanItemInstance* GetFirstEquippedItemInstance(bool bIgnoreArmor = true) const;
+	UPanItemInstance* GetEquippedItemInstance(EArmorType ArmorType) const;
+	UPanItemInstance* GetEquippedItemInstance(EWeaponHandType WeaponHandType) const;
+	UPanItemInstance* GetEquippedItemInstance(EEquipmentSlotType EquipmentSlotType) const;
 
 public:
 	FOnEquipStateChanged OnEquipStateChanged;
 	
 private:
 	UPROPERTY(Replicated)
-	FD1EquipList EquipList;
+	FPanEquipList EquipList;
 
 	UPROPERTY(ReplicatedUsing=OnRep_CurrentEquipState)
 	EEquipState CurrentEquipState = EEquipState::Count;

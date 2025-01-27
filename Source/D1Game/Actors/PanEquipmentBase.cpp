@@ -1,21 +1,21 @@
-﻿#include "D1EquipmentBase.h"
+﻿#include "PanEquipmentBase.h"
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/LyraAbilitySystemComponent.h"
 #include "Character/LyraCharacter.h"
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
-#include "Data/D1ItemData.h"
-#include "Item/Fragments/D1ItemFragment_Equipable_Weapon.h"
-#include "Item/Managers/D1EquipManagerComponent.h"
+#include "Data/PanItemData.h"
+#include "Item/Fragments/PanItemFragment_Equipable_Weapon.h"
+#include "Item/Managers/PanEquipManagerComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
 #include "Physics/LyraCollisionChannels.h"
 #include "System/LyraAssetManager.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(D1EquipmentBase)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(PanEquipmentBase)
 
-AD1EquipmentBase::AD1EquipmentBase(const FObjectInitializer& ObjectInitializer)
+APanEquipmentBase::APanEquipmentBase(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = false;
@@ -41,7 +41,7 @@ AD1EquipmentBase::AD1EquipmentBase(const FObjectInitializer& ObjectInitializer)
 	TraceDebugCollision->PrimaryComponentTick.bStartWithTickEnabled = false;
 }
 
-void AD1EquipmentBase::BeginPlay()
+void APanEquipmentBase::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -54,7 +54,7 @@ void AD1EquipmentBase::BeginPlay()
 	}
 }
 
-void AD1EquipmentBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void APanEquipmentBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
@@ -66,7 +66,7 @@ void AD1EquipmentBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(ThisClass, bCanBlock);
 }
 
-void AD1EquipmentBase::Destroyed()
+void APanEquipmentBase::Destroyed()
 {
 	if (bOnlyUseForLocal)
 		return;
@@ -78,9 +78,9 @@ void AD1EquipmentBase::Destroyed()
 			SkillAbilitySetHandles.TakeFromAbilitySystem(ASC);
 		}
 
-		if (UD1EquipManagerComponent* EquipManager = Character->FindComponentByClass<UD1EquipManagerComponent>())
+		if (UPanEquipManagerComponent* EquipManager = Character->FindComponentByClass<UPanEquipManagerComponent>())
 		{
-			TArray<FD1EquipEntry>& Entries = EquipManager->GetAllEntries();
+			TArray<FPanEquipEntry>& Entries = EquipManager->GetAllEntries();
 			if (Entries[(int32)EquipmentSlotType].GetEquipmentActor() == this)
 			{
 				Entries[(int32)EquipmentSlotType].SetEquipmentActor(nullptr);
@@ -91,7 +91,7 @@ void AD1EquipmentBase::Destroyed()
 	Super::Destroyed();
 }
 
-void AD1EquipmentBase::Init(int32 InTemplateID, EEquipmentSlotType InEquipmentSlotType)
+void APanEquipmentBase::Init(int32 InTemplateID, EEquipmentSlotType InEquipmentSlotType)
 {
 	if (bOnlyUseForLocal)
 		return;
@@ -100,7 +100,7 @@ void AD1EquipmentBase::Init(int32 InTemplateID, EEquipmentSlotType InEquipmentSl
 	EquipmentSlotType = InEquipmentSlotType;
 }
 
-void AD1EquipmentBase::ChangeBlockState(bool bShouldBlock)
+void APanEquipmentBase::ChangeBlockState(bool bShouldBlock)
 {
 	if (bOnlyUseForLocal)
 		return;
@@ -112,26 +112,26 @@ void AD1EquipmentBase::ChangeBlockState(bool bShouldBlock)
 	}
 }
 
-void AD1EquipmentBase::OnRep_CanBlock()
+void APanEquipmentBase::OnRep_CanBlock()
 {
 	if (bOnlyUseForLocal)
 		return;
 	
-	MeshComponent->SetCollisionResponseToChannel(D1_ObjectChannel_Projectile, bCanBlock ? ECR_Block : ECR_Ignore);
+	MeshComponent->SetCollisionResponseToChannel(Pan_ObjectChannel_Projectile, bCanBlock ? ECR_Block : ECR_Ignore);
 }
 
-void AD1EquipmentBase::OnRep_EquipmentSlotType()
+void APanEquipmentBase::OnRep_EquipmentSlotType()
 {
 	if (bOnlyUseForLocal)
 		return;
 	
-	if (GetOwner() && GetOwner()->FindComponentByClass<UD1EquipManagerComponent>())
+	if (GetOwner() && GetOwner()->FindComponentByClass<UPanEquipManagerComponent>())
 	{
 		if (ALyraCharacter* Character = Cast<ALyraCharacter>(GetOwner()))
 		{
-			if (UD1EquipManagerComponent* EquipManager = Character->FindComponentByClass<UD1EquipManagerComponent>())
+			if (UPanEquipManagerComponent* EquipManager = Character->FindComponentByClass<UPanEquipManagerComponent>())
 			{
-				TArray<FD1EquipEntry>& Entries = EquipManager->GetAllEntries();
+				TArray<FPanEquipEntry>& Entries = EquipManager->GetAllEntries();
 				Entries[(int32)EquipmentSlotType].SetEquipmentActor(this);
 			}
 		}
@@ -142,7 +142,7 @@ void AD1EquipmentBase::OnRep_EquipmentSlotType()
 	}
 }
 
-UAbilitySystemComponent* AD1EquipmentBase::GetAbilitySystemComponent() const
+UAbilitySystemComponent* APanEquipmentBase::GetAbilitySystemComponent() const
 {
 	UAbilitySystemComponent* ASC = nullptr;
 	if (ALyraCharacter* LyraCharacter = Cast<ALyraCharacter>(GetOwner()))
@@ -152,14 +152,14 @@ UAbilitySystemComponent* AD1EquipmentBase::GetAbilitySystemComponent() const
 	return ASC;
 }
 
-UAnimMontage* AD1EquipmentBase::GetEquipMontage()
+UAnimMontage* APanEquipmentBase::GetEquipMontage()
 {
 	UAnimMontage* EquipMontage = nullptr;
 	
 	if (TemplateID > 0)
 	{
-		const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(TemplateID);
-		if (const UD1ItemFragment_Equipable_Attachment* AttachmentFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equipable_Attachment>())
+		const UPanItemTemplate& ItemTemplate = UPanItemData::Get().FindItemTemplateByID(TemplateID);
+		if (const UPanItemFragment_Equipable_Attachment* AttachmentFragment = ItemTemplate.FindFragmentByClass<UPanItemFragment_Equipable_Attachment>())
 		{
 			EquipMontage = ULyraAssetManager::GetAssetByPath<UAnimMontage>(AttachmentFragment->EquipMontage);
 		}
@@ -168,14 +168,14 @@ UAnimMontage* AD1EquipmentBase::GetEquipMontage()
 	return EquipMontage;
 }
 
-UAnimMontage* AD1EquipmentBase::GetHitMontage(AActor* InstigatorActor, const FVector& HitLocation, bool IsBlocked)
+UAnimMontage* APanEquipmentBase::GetHitMontage(AActor* InstigatorActor, const FVector& HitLocation, bool IsBlocked)
 {
 	UAnimMontage* SelectedMontage = nullptr;
 	
 	if (InstigatorActor && TemplateID > 0)
 	{
-		const UD1ItemTemplate& ItemTemplate = UD1ItemData::Get().FindItemTemplateByID(TemplateID);
-		if (const UD1ItemFragment_Equipable_Attachment* AttachmentFragment = ItemTemplate.FindFragmentByClass<UD1ItemFragment_Equipable_Attachment>())
+		const UPanItemTemplate& ItemTemplate = UPanItemData::Get().FindItemTemplateByID(TemplateID);
+		if (const UPanItemFragment_Equipable_Attachment* AttachmentFragment = ItemTemplate.FindFragmentByClass<UPanItemFragment_Equipable_Attachment>())
 		{
 			if (IsBlocked)
 			{
