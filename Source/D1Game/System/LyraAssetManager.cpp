@@ -8,6 +8,8 @@
 #include "Data/PanItemData.h"
 #include "Data/PanClassData.h"
 #include "Data/PanAssetData.h"
+#include "Data/PanUIData.h"
+#include "Data/PanCheatData.h"
 #include "AbilitySystemGlobals.h"
 #include "Character/LyraPawnData.h"
 #include "Misc/App.h"
@@ -123,6 +125,7 @@ void ULyraAssetManager::StartInitialLoading()
 		STARTUP_JOB_WEIGHTED(GetItemData(), 25.f);
 		STARTUP_JOB_WEIGHTED(GetClassData(), 25.f);
 		STARTUP_JOB_WEIGHTED(GetAssetData(), 25.f);
+		//STARTUP_JOB_WEIGHTED(GetUIData(), 25.f);
 	}
 
 	// Run all the queued up startup jobs
@@ -167,6 +170,16 @@ const UPanClassData& ULyraAssetManager::GetClassData()
 const UPanAssetData& ULyraAssetManager::GetAssetData()
 {
 	return GetOrLoadTypedGameData<UPanAssetData>(AssetDataPath);
+}
+
+const UPanUIData& ULyraAssetManager::GetUIData()
+{
+	return GetOrLoadTypedGameData<UPanUIData>(UIDataPath);
+}
+
+const UPanCheatData& ULyraAssetManager::GetCheatData()
+{
+	return GetOrLoadTypedGameData<UPanCheatData>(CheatDataPath);
 }
 
 UPrimaryDataAsset* ULyraAssetManager::LoadGameDataOfClass(TSubclassOf<UPrimaryDataAsset> DataClass, const TSoftObjectPtr<UPrimaryDataAsset>& DataClassPath, FPrimaryAssetType PrimaryAssetType)

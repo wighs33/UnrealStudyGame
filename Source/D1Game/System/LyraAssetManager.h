@@ -6,6 +6,7 @@
 #include "LyraAssetManagerStartupJob.h"
 #include "Templates/SubclassOf.h"
 #include "Data/PanAssetData.h"
+#include "Data/PanUIData.h"
 #include "LyraAssetManager.generated.h"
 
 class UPrimaryDataAsset;
@@ -16,6 +17,7 @@ class UPanCharacterData;
 class UPanItemData;
 class UPanClassData;
 class UPanAssetData;
+class UPanCheatData;
 
 struct FLyraBundles
 {
@@ -63,6 +65,8 @@ public:
 	const UPanItemData& GetItemData();
 	const UPanClassData& GetClassData();
 	const UPanAssetData& GetAssetData();
+	const UPanUIData& GetUIData();
+	const UPanCheatData& GetCheatData();
 
 protected:
 	template <typename GameDataClass>
@@ -118,6 +122,12 @@ protected:
 
 	UPROPERTY(Config)
 	TSoftObjectPtr<UPanAssetData> AssetDataPath;
+
+	UPROPERTY(Config)
+	TSoftObjectPtr<UPanUIData> UIDataPath;
+
+	UPROPERTY(Config)
+	TSoftObjectPtr<UPanCheatData> CheatDataPath;
 
 private:
 	// Flushes the StartupJobs array. Processes all startup work.
