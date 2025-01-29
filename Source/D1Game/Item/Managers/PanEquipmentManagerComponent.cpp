@@ -68,11 +68,13 @@ UPanItemInstance* FPanEquipmentEntry::Reset()
 	return RemovedItemInstance;
 }
 
+// 변경사항만 네트워크로 보내기 위한 직렬화
 bool FPanEquipmentList::NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams)
 {
 	return FFastArraySerializer::FastArrayDeltaSerialize<FPanEquipmentEntry, FPanEquipmentList>(Entries, DeltaParams,*this);
 }
 
+// 동기화로 추가되었을 때
 void FPanEquipmentList::PostReplicatedAdd(const TArrayView<int32> AddedIndices, int32 FinalSize)
 {
 	for (int32 AddedIndex : AddedIndices)
@@ -83,20 +85,24 @@ void FPanEquipmentList::PostReplicatedAdd(const TArrayView<int32> AddedIndices, 
 		
 		if (Entry.GetItemInstance())
 		{
+			// 메시지 보내기
 			BroadcastChangedMessage((EEquipmentSlotType)AddedIndex, Entry.GetItemInstance(), Entry.GetItemCount());
 		}
 	}
 }
 
+// 동기화로 변경되었을 때
 void FPanEquipmentList::PostReplicatedChange(const TArrayView<int32> ChangedIndices, int32 FinalSize)
 {
 	for (int32 ChangedIndex : ChangedIndices)
 	{
 		const FPanEquipmentEntry& Entry = Entries[ChangedIndex];
+		// 메시지 보내기
 		BroadcastChangedMessage((EEquipmentSlotType)ChangedIndex, Entry.GetItemInstance(), Entry.GetItemCount());
 	}
 }
 
+// 변경사항 브로드캐스트
 void FPanEquipmentList::BroadcastChangedMessage(EEquipmentSlotType EquipmentSlotType, UPanItemInstance* ItemInstance, int32 ItemCount)
 {
 	if (EquipmentManager->OnEquipmentEntryChanged.IsBound())
@@ -324,7 +330,7 @@ void UPanEquipmentManagerComponent::SetEquipment(EEquipmentSlotType EquipmentSlo
 		const UPanItemFragment_Equipable_Weapon* WeaponFragment = Cast<UPanItemFragment_Equipable_Weapon>(EquippableFragment);
 		EWeaponHandType WeaponHandType = WeaponFragment->WeaponHandType;
 
-		// 주요 무기 슬롯이라면ㅋ
+		// 주요 무기 슬롯이라면
 		if (IsPrimaryWeaponSlot(EquipmentSlotType))
 		{
 			if (WeaponHandType == EWeaponHandType::LeftHand || WeaponHandType == EWeaponHandType::RightHand)
@@ -374,6 +380,7 @@ void UPanEquipmentManagerComponent::SetEquipment(EEquipmentSlotType EquipmentSlo
 			EEquipState EquipState = UPanEquipManagerComponent::ConvertToEquipState(WeaponSlotType);
 			if (EquipManager->GetCurrentEquipState() != EquipState)
 			{
+				// 장착 매니저 컴포넌트의 장착 상태 업데이트
 				EquipManager->ChangeEquipState(EquipState);
 			}
 		}

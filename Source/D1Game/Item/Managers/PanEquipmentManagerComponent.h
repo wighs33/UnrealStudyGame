@@ -62,6 +62,7 @@ public:
 	FPanEquipmentList() : EquipmentManager(nullptr) { }
 	FPanEquipmentList(UPanEquipmentManagerComponent* InOwnerComponent) : EquipmentManager(InOwnerComponent) { }
 	
+// 네트워크
 public:
 	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams);
 	void PostReplicatedAdd(const TArrayView<int32> AddedIndices, int32 FinalSize);
@@ -172,7 +173,7 @@ private:
 	friend class UPanItemManagerComponent;
 	friend class ULyraCheatManager;
 	
-	// 장비 리스트
+	// 장비 리스트 (컴포넌트 리플리케이션을 사용)
 	UPROPERTY(Replicated)
 	FPanEquipmentList EquipmentList;
 };

@@ -32,6 +32,7 @@ void FPanEquipEntry::Init(UPanItemInstance* InItemInstance)
 	ItemInstance ? Equip() : Unequip();
 }
 
+// 장착
 void FPanEquipEntry::Equip()
 {
 	if (ItemInstance == nullptr)
@@ -47,6 +48,8 @@ void FPanEquipEntry::Equip()
 
 	if (EquipManager->GetOwner()->HasAuthority())
 	{
+		// 스킬 관련 부분
+
 		/* - TEMP Rookiss
 		if (ULyraAbilitySystemComponent* ASC = Cast<ULyraAbilitySystemComponent>(EquipManager->GetAbilitySystemComponent()))
 		{
@@ -119,6 +122,8 @@ void FPanEquipEntry::Equip()
 				{
 					SpawnedPocketWorldActor->Destroy();
 				}
+
+				// 아이템 창에서의 캐릭터를 그리기
 
 				/* TEMP Rookiss
 				// Spawn Current Pocket Weapon				
@@ -432,6 +437,7 @@ void UPanEquipManagerComponent::ReadyForReplication()
 	}
 }
 
+// 장착
 void UPanEquipManagerComponent::Equip(EEquipmentSlotType EquipmentSlotType, UPanItemInstance* ItemInstance)
 {
 	check(GetOwner()->HasAuthority());
@@ -439,9 +445,11 @@ void UPanEquipManagerComponent::Equip(EEquipmentSlotType EquipmentSlotType, UPan
 	if (EquipmentSlotType == EEquipmentSlotType::Count || ItemInstance == nullptr)
 		return;
 	
+	// 리스트에서 장착
 	EquipList.Equip(EquipmentSlotType, ItemInstance);
 	if (IsUsingRegisteredSubObjectList() && IsReadyForReplication() && ItemInstance)
 	{
+		// ItemInstance를 동기화
 		AddReplicatedSubObject(ItemInstance);
 	}
 }
@@ -464,6 +472,7 @@ void UPanEquipManagerComponent::Unequip(EEquipmentSlotType EquipmentSlotType)
 	}
 }
 
+// 현재 슬롯에 장착
 void UPanEquipManagerComponent::EquipCurrentSlots()
 {
 	check(GetOwner()->HasAuthority());
@@ -475,6 +484,7 @@ void UPanEquipManagerComponent::EquipCurrentSlots()
 	{
 		for (EEquipmentSlotType EquipmentSlotType : UPanEquipManagerComponent::GetEquipmentSlotsByEquipState(CurrentEquipState))
 		{
+			// 장비 매니저에서 아이템 가져온 후 장착
 			Equip(EquipmentSlotType, EquipmentManager->GetItemInstance(EquipmentSlotType));
 		}
 	}
@@ -493,10 +503,13 @@ void UPanEquipManagerComponent::UnequipCurrentSlots()
 	}
 }
 
+// 장착 상태 변경
 void UPanEquipManagerComponent::ChangeEquipState(EEquipState NewEquipState)
 {
+	// 클라에서 실행되면 크래시
 	check(GetOwner()->HasAuthority());
 
+	// 장착 상태를 변경할 수 있다면
 	if (CanChangeEquipState(NewEquipState))
 	{
 		if (CurrentEquipState == NewEquipState)
@@ -504,8 +517,10 @@ void UPanEquipManagerComponent::ChangeEquipState(EEquipState NewEquipState)
 			NewEquipState = EEquipState::Unarmed;
 		}
 		
+		// 현재 슬롯에 장착 해제
 		UnequipCurrentSlots();
 		CurrentEquipState = NewEquipState;
+		// 현재 슬롯에 장착
 		EquipCurrentSlots();
 	}
 }

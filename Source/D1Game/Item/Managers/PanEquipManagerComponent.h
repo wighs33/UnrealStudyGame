@@ -37,6 +37,7 @@ private:
 	friend struct FPanEquipList;
 	friend class UPanEquipManagerComponent;
 	
+	// 아이템 인스턴스
 	UPROPERTY()
 	TObjectPtr<UPanItemInstance> ItemInstance;
 
@@ -72,6 +73,7 @@ public:
 	FPanEquipList() : EquipManager(nullptr) { }
 	FPanEquipList(UPanEquipManagerComponent* InOwnerComponent) : EquipManager(InOwnerComponent) { }
 
+// 네트워크
 public:
 	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams);
 	void PostReplicatedAdd(const TArrayView<int32> AddedIndices, int32 FinalSize);
@@ -87,6 +89,7 @@ public:
 private:
 	friend class UPanEquipManagerComponent;
 
+	// 네트워크 대상
 	UPROPERTY()
 	TArray<FPanEquipEntry> Entries;
 	
