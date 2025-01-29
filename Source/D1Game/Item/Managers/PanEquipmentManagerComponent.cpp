@@ -1,8 +1,8 @@
 ﻿#include "PanEquipmentManagerComponent.h"
 
 #include "PanEquipManagerComponent.h"
-//#include "PanInventoryManagerComponent.h"
-//#include "PanItemManagerComponent.h"
+#include "PanInventoryManagerComponent.h"
+#include "PanItemManagerComponent.h"
 #include "Character/LyraCharacter.h"
 #include "Data/PanItemData.h"
 #include "Engine/ActorChannel.h"
@@ -185,6 +185,427 @@ void UPanEquipmentManagerComponent::ReadyForReplication()
 	}
 }
 
+int32 UPanEquipmentManagerComponent::CanMoveOrMergeEquipment(UPanEquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType) const
+{
+	if (OtherComponent == nullptr)
+		return 0;
+
+	if (FromEquipmentSlotType == EEquipmentSlotType::Unarmed_LeftHand || FromEquipmentSlotType == EEquipmentSlotType::Unarmed_RightHand || FromEquipmentSlotType == EEquipmentSlotType::Count)
+		return 0;
+
+	const UPanItemInstance* FromItemInstance = OtherComponent->GetItemInstance(FromEquipmentSlotType);
+	const int32 FromItemCount = OtherComponent->GetItemCount(FromEquipmentSlotType);
+
+	if (FromItemInstance == nullptr)
+		return 0;
+
+	if (this == OtherComponent && FromEquipmentSlotType == ToEquipmentSlotType)
+		return FromItemCount;
+
+	return CanAddEquipment(FromItemInstance->GetItemTemplateID(), FromItemInstance->GetItemRarity(), FromItemCount, ToEquipmentSlotType);
+}
+
+int32 UPanEquipmentManagerComponent::CanMoveOrMergeEquipment(UPanInventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType) const
+{
+	if (OtherComponent == nullptr)
+		return 0;
+
+	const FIntPoint& FromInventorySlotCount = OtherComponent->GetInventorySlotCount();
+	if (FromItemSlotPos.X < 0 || FromItemSlotPos.Y < 0 || FromItemSlotPos.X >= FromInventorySlotCount.X || FromItemSlotPos.Y >= FromInventorySlotCount.Y)
+		return 0;
+
+	const UPanItemInstance* FromItemInstance = OtherComponent->GetItemInstance(FromItemSlotPos);
+	const int32 FromItemCount = OtherComponent->GetItemCount(FromItemSlotPos);
+
+	if (FromItemInstance == nullptr)
+		return 0;
+
+	return CanAddEquipment(FromItemInstance->GetItemTemplateID(), FromItemInstance->GetItemRarity(), FromItemCount, ToEquipmentSlotType);
+}
+
+int32 UPanEquipmentManagerComponent::CanMoveOrMergeEquipment_Quick(UPanEquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType& OutToEquipmentSlotType) const
+{
+	OutToEquipmentSlotType = EEquipmentSlotType::Count;
+
+	if (OtherComponent == nullptr)
+		return 0;
+
+	if (FromEquipmentSlotType == EEquipmentSlotType::Unarmed_LeftHand || FromEquipmentSlotType == EEquipmentSlotType::Unarmed_RightHand || FromEquipmentSlotType == EEquipmentSlotType::Count)
+		return 0;
+
+	if (this == OtherComponent)
+		return 0;
+
+	const UPanItemInstance* FromItemInstance = OtherComponent->GetItemInstance(FromEquipmentSlotType);
+	const int32 FromItemCount = OtherComponent->GetItemCount(FromEquipmentSlotType);
+
+	if (FromItemInstance == nullptr)
+		return 0;
+
+	return CanMoveOrMergeEquipment_Quick(FromItemInstance->GetItemTemplateID(), FromItemInstance->GetItemRarity(), FromItemCount, OutToEquipmentSlotType);
+}
+
+int32 UPanEquipmentManagerComponent::CanMoveOrMergeEquipment_Quick(UPanInventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType& OutToEquipmentSlotType) const
+{
+	OutToEquipmentSlotType = EEquipmentSlotType::Count;
+
+	if (OtherComponent == nullptr)
+		return 0;
+
+	const FIntPoint& FromInventorySlotCount = OtherComponent->GetInventorySlotCount();
+	if (FromItemSlotPos.X < 0 || FromItemSlotPos.Y < 0 || FromItemSlotPos.X >= FromInventorySlotCount.X || FromItemSlotPos.Y >= FromInventorySlotCount.Y)
+		return 0;
+
+	const UPanItemInstance* FromItemInstance = OtherComponent->GetItemInstance(FromItemSlotPos);
+	const int32 FromItemCount = OtherComponent->GetItemCount(FromItemSlotPos);
+
+	if (FromItemInstance == nullptr)
+		return 0;
+
+	return CanMoveOrMergeEquipment_Quick(FromItemInstance->GetItemTemplateID(), FromItemInstance->GetItemRarity(), FromItemCount, OutToEquipmentSlotType);
+}
+
+int32 UPanEquipmentManagerComponent::CanMoveOrMergeEquipment_Quick(int32 FromItemTemplateID, EItemRarity FromItemRarity, int32 FromItemCount, EEquipmentSlotType& OutToEquipmentSlotType) const
+{
+	OutToEquipmentSlotType = EEquipmentSlotType::Count;
+
+	if (FromItemTemplateID <= 0 || FromItemRarity == EItemRarity::Count || FromItemCount <= 0)
+		return 0;
+
+	const UPanItemTemplate& FromItemTemplate = UPanItemData::Get().FindItemTemplateByID(FromItemTemplateID);
+	const UPanItemFragment_Equipable* FromEquippableFragment = FromItemTemplate.FindFragmentByClass<UPanItemFragment_Equipable>();
+	if (FromEquippableFragment == nullptr)
+		return 0;
+
+	if (FromEquippableFragment->EquipmentType == EEquipmentType::Weapon)
+	{
+		const UPanItemFragment_Equipable_Weapon* FromWeaponFragment = Cast<UPanItemFragment_Equipable_Weapon>(FromEquippableFragment);
+
+		for (int32 i = 0; i < (int32)EWeaponSlotType::Count; i++)
+		{
+			EEquipmentSlotType ToEquipmentSlotType = UPanEquipManagerComponent::ConvertToEquipmentSlotType(FromWeaponFragment->WeaponHandType, (EWeaponSlotType)i);
+			int32 MovableCount = CanAddEquipment(FromItemTemplateID, FromItemRarity, FromItemCount, ToEquipmentSlotType);
+			if (MovableCount > 0)
+			{
+				OutToEquipmentSlotType = ToEquipmentSlotType;
+				return MovableCount;
+			}
+		}
+	}
+	else if (FromEquippableFragment->EquipmentType == EEquipmentType::Armor)
+	{
+		const UPanItemFragment_Equipable_Armor* FromArmorFragment = Cast<UPanItemFragment_Equipable_Armor>(FromEquippableFragment);
+
+		EEquipmentSlotType ToEquipmentSlotType = UPanEquipManagerComponent::ConvertToEquipmentSlotType(FromArmorFragment->ArmorType);
+		int32 MovableCount = CanAddEquipment(FromItemTemplateID, FromItemRarity, FromItemCount, ToEquipmentSlotType);
+		if (MovableCount > 0)
+		{
+			OutToEquipmentSlotType = ToEquipmentSlotType;
+			return MovableCount;
+		}
+	}
+	else if (FromEquippableFragment->EquipmentType == EEquipmentType::Utility)
+	{
+		EEquipmentSlotType ToEquipmentSlotPick = EEquipmentSlotType::Count;
+
+		for (int32 i = 0; i < (int32)EUtilitySlotType::Count; i++)
+		{
+			EEquipmentSlotType ToEquipmentSlotType = UPanEquipManagerComponent::ConvertToEquipmentSlotType((EUtilitySlotType)i);
+			UPanItemInstance* ToItemInstance = GetItemInstance(ToEquipmentSlotType);
+			if (ToItemInstance == nullptr)
+			{
+				ToEquipmentSlotPick = ToEquipmentSlotType;
+				break;
+			}
+			else
+			{
+				const int32 ToItemCount = GetItemCount(ToEquipmentSlotType);
+				const UPanItemTemplate& ToItemTemplate = UPanItemData::Get().FindItemTemplateByID(ToItemInstance->GetItemTemplateID());
+				if (ToItemTemplate.MaxStackCount > 1 && ToItemCount < ToItemTemplate.MaxStackCount && ToItemInstance->GetItemRarity() == FromItemRarity && ToItemInstance->GetItemTemplateID() == FromItemTemplateID)
+				{
+					ToEquipmentSlotPick = ToEquipmentSlotType;
+					break;
+				}
+			}
+		}
+
+		if (ToEquipmentSlotPick == EEquipmentSlotType::Count)
+			return 0;
+
+		int32 MovableCount = CanAddEquipment(FromItemTemplateID, FromItemRarity, FromItemCount, ToEquipmentSlotPick);
+		if (MovableCount > 0)
+		{
+			OutToEquipmentSlotType = ToEquipmentSlotPick;
+			return MovableCount;
+		}
+	}
+
+	return 0;
+}
+
+bool UPanEquipmentManagerComponent::CanSwapEquipment(UPanEquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType) const
+{
+	if (OtherComponent == nullptr || FromEquipmentSlotType == EEquipmentSlotType::Count)
+		return false;
+
+	const TArray<FPanEquipmentEntry>& FromEntries = OtherComponent->GetAllEntries();
+	const FPanEquipmentEntry& FromEntry = FromEntries[(int32)FromEquipmentSlotType];
+	UPanItemInstance* FromItemInstance = FromEntry.GetItemInstance();
+
+	if (FromItemInstance == nullptr)
+		return false;
+
+	const UPanItemFragment_Equipable* FromEquippableFragment = FromItemInstance->FindFragmentByClass<UPanItemFragment_Equipable>();
+	if (FromEquippableFragment == nullptr)
+		return false;
+
+	if (this == OtherComponent && FromEquipmentSlotType == ToEquipmentSlotType)
+		return true;
+
+	const UPanItemInstance* ToItemInstance = GetItemInstance(ToEquipmentSlotType);
+	if (ToItemInstance == nullptr)
+		return false;
+
+	if (FromEquippableFragment->EquipmentType == EEquipmentType::Weapon)
+	{
+		const UPanItemFragment_Equipable_Weapon* FromWeaponFragment = Cast<UPanItemFragment_Equipable_Weapon>(FromEquippableFragment);
+		if (FromWeaponFragment == nullptr)
+			return false;
+
+		EWeaponHandType FromWeaponHandType = FromWeaponFragment->WeaponHandType;
+		if (IsSameWeaponHandType(ToEquipmentSlotType, FromWeaponHandType) == false)
+			return false;
+
+		return true;
+	}
+	else if (FromEquippableFragment->EquipmentType == EEquipmentType::Armor)
+	{
+		if (FromEquipmentSlotType != ToEquipmentSlotType)
+			return false;
+
+		return true;
+	}
+	else if (FromEquippableFragment->EquipmentType == EEquipmentType::Utility)
+	{
+		if (IsUtilitySlot(ToEquipmentSlotType) == false)
+			return false;
+
+		return true;
+	}
+
+	return false;
+}
+
+bool UPanEquipmentManagerComponent::CanSwapEquipment(UPanInventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType, FIntPoint& OutToItemSlotPos)
+{
+	if (OtherComponent == nullptr)
+		return false;
+
+	const FIntPoint& FromInventorySlotCount = OtherComponent->GetInventorySlotCount();
+	if (FromItemSlotPos.X < 0 || FromItemSlotPos.Y < 0 || FromItemSlotPos.X >= FromInventorySlotCount.X || FromItemSlotPos.Y >= FromInventorySlotCount.Y)
+		return false;
+
+	if (ToEquipmentSlotType == EEquipmentSlotType::Unarmed_LeftHand || ToEquipmentSlotType == EEquipmentSlotType::Unarmed_RightHand || ToEquipmentSlotType == EEquipmentSlotType::Count)
+		return false;
+
+	UPanItemInstance* FromItemInstance = OtherComponent->GetItemInstance(FromItemSlotPos);
+	if (FromItemInstance == nullptr)
+		return false;
+
+	const UPanItemInstance* ToItemInstance = GetItemInstance(ToEquipmentSlotType);
+	if (ToItemInstance == nullptr)
+		return false;
+
+	const UPanItemFragment_Equipable* FromEquippableFragment = FromItemInstance->FindFragmentByClass<UPanItemFragment_Equipable>();
+	if (FromEquippableFragment == nullptr)
+		return false;
+
+	if (FromEquippableFragment->EquipmentType == EEquipmentType::Weapon)
+	{
+		const UPanItemFragment_Equipable_Weapon* FromWeaponFragment = Cast<UPanItemFragment_Equipable_Weapon>(FromEquippableFragment);
+		if (FromWeaponFragment == nullptr)
+			return false;
+
+		EWeaponHandType FromWeaponHandType = FromWeaponFragment->WeaponHandType;
+		if (IsSameWeaponHandType(ToEquipmentSlotType, FromWeaponHandType) == false)
+			return false;
+	}
+	else if (FromEquippableFragment->EquipmentType == EEquipmentType::Armor)
+	{
+		const UPanItemFragment_Equipable_Armor* FromArmorFragment = Cast<UPanItemFragment_Equipable_Armor>(FromEquippableFragment);
+		EEquipmentSlotType FromEquipmentSlotType = UPanEquipManagerComponent::ConvertToEquipmentSlotType(FromArmorFragment->ArmorType);
+
+		if (FromEquipmentSlotType != ToEquipmentSlotType)
+			return false;
+	}
+	else if (FromEquippableFragment->EquipmentType == EEquipmentType::Utility)
+	{
+		if (IsUtilitySlot(ToEquipmentSlotType) == false)
+			return false;
+	}
+
+	const UPanItemTemplate& FromItemTemplate = UPanItemData::Get().FindItemTemplateByID(FromItemInstance->GetItemTemplateID());
+	const FIntPoint& FromSlotCount = FromItemTemplate.SlotCount;
+
+	const UPanItemTemplate& ToItemTemplate = UPanItemData::Get().FindItemTemplateByID(ToItemInstance->GetItemTemplateID());
+	const FIntPoint& ToSlotCount = ToItemTemplate.SlotCount;
+
+	TArray<bool> TempSlotChecks = OtherComponent->SlotChecks;
+	OtherComponent->MarkSlotChecks(TempSlotChecks, false, FromItemSlotPos, FromSlotCount);
+
+	if (OtherComponent->IsEmpty(TempSlotChecks, FromItemSlotPos, ToSlotCount))
+	{
+		OutToItemSlotPos = FromItemSlotPos;
+		return true;
+	}
+	else
+	{
+		const FIntPoint StartSlotPos = FIntPoint::ZeroValue;
+		const FIntPoint EndSlotPos = FromInventorySlotCount - ToSlotCount;
+
+		for (int32 y = StartSlotPos.Y; y <= EndSlotPos.Y; y++)
+		{
+			for (int32 x = StartSlotPos.X; x <= EndSlotPos.X; x++)
+			{
+				int32 Index = y * FromInventorySlotCount.X + x;
+				if (TempSlotChecks.IsValidIndex(Index) == false || TempSlotChecks[Index])
+					continue;
+
+				FIntPoint ToItemSlotPos = FIntPoint(x, y);
+				if (OtherComponent->IsEmpty(TempSlotChecks, ToItemSlotPos, ToSlotCount))
+				{
+					OutToItemSlotPos = ToItemSlotPos;
+					return true;
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
+bool UPanEquipmentManagerComponent::CanSwapEquipment_Quick(UPanEquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType& OutToEquipmentSlotType) const
+{
+	OutToEquipmentSlotType = EEquipmentSlotType::Count;
+
+	if (OtherComponent == nullptr)
+		return false;
+
+	if (FromEquipmentSlotType == EEquipmentSlotType::Unarmed_LeftHand || FromEquipmentSlotType == EEquipmentSlotType::Unarmed_RightHand || FromEquipmentSlotType == EEquipmentSlotType::Count)
+		return false;
+
+	UPanItemInstance* FromItemInstance = OtherComponent->GetItemInstance(FromEquipmentSlotType);
+	if (FromItemInstance == nullptr)
+		return false;
+
+	const UPanItemFragment_Equipable* FromEquippableFragment = FromItemInstance->FindFragmentByClass<UPanItemFragment_Equipable>();
+	if (FromEquippableFragment == nullptr)
+		return false;
+
+	if (FromEquippableFragment->EquipmentType == EEquipmentType::Weapon)
+	{
+		const UPanItemFragment_Equipable_Weapon* FromWeaponFragment = Cast<UPanItemFragment_Equipable_Weapon>(FromEquippableFragment);
+		if (FromWeaponFragment == nullptr)
+			return false;
+
+		if (FindPairItemInstance(FromItemInstance, OutToEquipmentSlotType))
+			return true;
+	}
+	else if (FromEquippableFragment->EquipmentType == EEquipmentType::Armor)
+	{
+		const UPanItemFragment_Equipable_Armor* FromArmorFragment = Cast<UPanItemFragment_Equipable_Armor>(FromEquippableFragment);
+		EEquipmentSlotType ToEquipmentSlotType = UPanEquipManagerComponent::ConvertToEquipmentSlotType(FromArmorFragment->ArmorType);
+
+		if (GetItemInstance(ToEquipmentSlotType))
+		{
+			OutToEquipmentSlotType = ToEquipmentSlotType;
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool UPanEquipmentManagerComponent::CanSwapEquipment_Quick(UPanInventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType& OutToEquipmentSlotType, FIntPoint& OutToItemSlotPos)
+{
+	OutToEquipmentSlotType = EEquipmentSlotType::Count;
+
+	if (OtherComponent == nullptr)
+		return false;
+
+	const FIntPoint& FromInventorySlotCount = OtherComponent->GetInventorySlotCount();
+	if (FromItemSlotPos.X < 0 || FromItemSlotPos.Y < 0 || FromItemSlotPos.X >= FromInventorySlotCount.X || FromItemSlotPos.Y >= FromInventorySlotCount.Y)
+		return false;
+
+	UPanItemInstance* FromItemInstance = OtherComponent->GetItemInstance(FromItemSlotPos);
+	if (FromItemInstance == nullptr)
+		return false;
+
+	const UPanItemFragment_Equipable* FromEquippableFragment = FromItemInstance->FindFragmentByClass<UPanItemFragment_Equipable>();
+	if (FromEquippableFragment == nullptr)
+		return false;
+
+	const UPanItemInstance* ToItemInstance = nullptr;
+
+	if (FromEquippableFragment->EquipmentType == EEquipmentType::Weapon)
+	{
+		const UPanItemFragment_Equipable_Weapon* FromWeaponFragment = Cast<UPanItemFragment_Equipable_Weapon>(FromEquippableFragment);
+		if (FromWeaponFragment == nullptr)
+			return false;
+
+		ToItemInstance = FindPairItemInstance(FromItemInstance, OutToEquipmentSlotType);
+	}
+	else if (FromEquippableFragment->EquipmentType == EEquipmentType::Armor)
+	{
+		const UPanItemFragment_Equipable_Armor* FromArmorFragment = Cast<UPanItemFragment_Equipable_Armor>(FromEquippableFragment);
+		OutToEquipmentSlotType = UPanEquipManagerComponent::ConvertToEquipmentSlotType(FromArmorFragment->ArmorType);
+
+		ToItemInstance = GetItemInstance(OutToEquipmentSlotType);
+	}
+
+	if (ToItemInstance == nullptr)
+		return false;
+
+	const UPanItemTemplate& FromItemTemplate = UPanItemData::Get().FindItemTemplateByID(FromItemInstance->GetItemTemplateID());
+	const FIntPoint& FromSlotCount = FromItemTemplate.SlotCount;
+
+	const UPanItemTemplate& ToItemTemplate = UPanItemData::Get().FindItemTemplateByID(ToItemInstance->GetItemTemplateID());
+	const FIntPoint& ToSlotCount = ToItemTemplate.SlotCount;
+
+	TArray<bool> TempSlotChecks = OtherComponent->SlotChecks;
+	OtherComponent->MarkSlotChecks(TempSlotChecks, false, FromItemSlotPos, FromSlotCount);
+
+	if (OtherComponent->IsEmpty(TempSlotChecks, FromItemSlotPos, ToSlotCount))
+	{
+		OutToItemSlotPos = FromItemSlotPos;
+		return true;
+	}
+	else
+	{
+		const FIntPoint StartSlotPos = FIntPoint::ZeroValue;
+		const FIntPoint EndSlotPos = FromInventorySlotCount - ToSlotCount;
+
+		for (int32 y = StartSlotPos.Y; y <= EndSlotPos.Y; y++)
+		{
+			for (int32 x = StartSlotPos.X; x <= EndSlotPos.X; x++)
+			{
+				int32 Index = y * FromInventorySlotCount.X + x;
+				if (TempSlotChecks.IsValidIndex(Index) == false || TempSlotChecks[Index])
+					continue;
+
+				FIntPoint ToItemSlotPos = FIntPoint(x, y);
+				if (OtherComponent->IsEmpty(TempSlotChecks, ToItemSlotPos, ToSlotCount))
+				{
+					OutToItemSlotPos = ToItemSlotPos;
+					return true;
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
 int32 UPanEquipmentManagerComponent::CanAddEquipment(int32 ItemTemplateID, EItemRarity ItemRarity, int32 ItemCount, EEquipmentSlotType ToEquipmentSlotType) const
 {
 	if (ItemTemplateID <= 0 || ItemRarity == EItemRarity::Count || ItemCount <= 0)
@@ -293,6 +714,7 @@ void UPanEquipmentManagerComponent::AddEquipment_Unsafe(EEquipmentSlotType Equip
 		
 		if (IsUsingRegisteredSubObjectList() && IsReadyForReplication() && ItemInstance)
 		{
+			// 아이템 추가
 			AddReplicatedSubObject(ItemInstance);
 		}
 		

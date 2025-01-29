@@ -113,7 +113,6 @@ protected:
 	virtual void ReadyForReplication() override;
 	
 public:
-	/*
 	int32 CanMoveOrMergeEquipment(UPanEquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType ToEquipmentSlotType) const;
 	int32 CanMoveOrMergeEquipment(UPanInventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType ToEquipmentSlotType) const;
 	
@@ -126,7 +125,6 @@ public:
 	
 	bool CanSwapEquipment_Quick(UPanEquipmentManagerComponent* OtherComponent, EEquipmentSlotType FromEquipmentSlotType, EEquipmentSlotType& OutToEquipmentSlotType) const;
 	bool CanSwapEquipment_Quick(UPanInventoryManagerComponent* OtherComponent, const FIntPoint& FromItemSlotPos, EEquipmentSlotType& OutToEquipmentSlotType, FIntPoint& OutToItemSlotPos);
-	*/
 	
 	int32 CanAddEquipment(int32 ItemTemplateID, EItemRarity ItemRarity, int32 ItemCount, EEquipmentSlotType ToEquipmentSlotType) const;
 	
