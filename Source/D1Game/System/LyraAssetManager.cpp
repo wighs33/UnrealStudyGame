@@ -125,7 +125,8 @@ void ULyraAssetManager::StartInitialLoading()
 		STARTUP_JOB_WEIGHTED(GetItemData(), 25.f);
 		STARTUP_JOB_WEIGHTED(GetClassData(), 25.f);
 		STARTUP_JOB_WEIGHTED(GetAssetData(), 25.f);
-		//STARTUP_JOB_WEIGHTED(GetUIData(), 25.f);
+		STARTUP_JOB_WEIGHTED(GetUIData(), 25.f);
+		STARTUP_JOB_WEIGHTED(GetCheatData(), 25.f);
 	}
 
 	// Run all the queued up startup jobs
